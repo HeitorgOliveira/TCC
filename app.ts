@@ -9,7 +9,7 @@ const port = 3000;
 
 const numSalt = 12;
 
-const pool = mysql.createPool({
+var con = mysql.createConnection({
     host: "143.106.241.3",
     user: "cl201174",
     password: "essaehumasenha!",
@@ -43,21 +43,20 @@ class Usuario {
         this.deficiencia = deficiencia;
         this.senha = bcrypt.hashSync(senha, numSalt);
     }
+    //"INSERT INTO AC_Usuario (nome, datanasc, email, celular, deficiencia, senha) VALUES (?, ?, ?, ?, ?, ?)",
 
     async cadastrar(): Promise<boolean>{
         try {
-          const connection = await pool.getConnection();
-          console.log(connection);
-          const resultado = await connection.execute(
-            "INSERT INTO AC_Usuario (nome, datanasc, email, celular, deficiencia, senha) VALUES (?, ?, ?, ?, ?, ?)",
-            [this.nome, this.datanasc, this.email, this.celular, this.deficiencia, this.senha]
-          );
-          connection.release();
-          if (resultado.affectedRows === 1) {
-            console.log(`AEEEE CADASTREI O ${this.nome}`);
-            return true;
-          }
-          return false;
+            con.connect((err : any) =>{
+                if(err) throw err;
+                console.log("Conectou");
+                var sql = `INSERT INTO AC_Usuario (usuario, datanasc, email, celular, deficiencias, senha) VALUES ('${this.nome}', '${this.datanasc}', '${this.email}', '${this.celular}', '${this.deficiencia}', '${this.senha}')`;
+                con.query(sql, (err : any, result: any) =>{
+                    if (err) throw err;
+                    console.log("1 dado modificado: ", result)
+                })
+            })
+          return true;
         } catch (err) {
           console.error(`ERRO: ${err}`);
           return false;
@@ -68,9 +67,9 @@ class Usuario {
 }
 
 app.set('view engine', 'ejs');
-app.set('views', path.join(__dirname, 'AccessCityWeb'));
+app.set('views', path.join(__dirname, 'Web'));
 
-app.use(express.static(path.join(__dirname, 'AccessCityWeb')));
+app.use(express.static(path.join(__dirname, 'Web')));
 app.use(bodyParser.urlencoded({extended: true}));
 app.use(bodyParser.json());
 
