@@ -21,12 +21,6 @@ const session = require('cookie-session');
 const app = (0, express_1.default)();
 const port = 3000;
 const numSalt = 12;
-var con = mysql.createConnection({
-    host: "143.106.241.3",
-    user: "cl201174",
-    password: "essaehumasenha!",
-    database: "cl201174",
-});
 app.use(session({
     name: "sessao",
     keys: ['key1', 'key2'],
@@ -38,27 +32,37 @@ app.use(session({
 }));
 class Usuario {
     constructor(nome, datanasc, email, celular, deficiencia, senha) {
+        this.con = mysql.createConnection({
+            host: "143.106.241.3",
+            user: "cl201174",
+            password: "essaehumasenha!",
+            database: "cl201174",
+        });
         this.nome = nome;
         this.datanasc = datanasc;
         this.email = email;
         this.celular = celular;
         this.deficiencia = deficiencia;
-        this.senha = bcrypt.hashSync(senha, numSalt);
+        this.senha = senha;
     }
     cadastrar() {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                con.connect((err) => {
-                    if (err)
-                        throw err;
-                    var sql = `INSERT INTO AC_Usuario (usuario, datanasc, email, celular, deficiencias, senha) VALUES ('${this.nome}', '${this.datanasc}', '${this.email}', '${this.celular}', '${this.deficiencia}', '${this.senha}')`;
-                    con.query(sql, (err, result) => {
-                        if (err)
-                            throw err;
-                        console.log("1 dado modificado: ", result);
-                    });
-                });
-                return true;
+                var queue = `SELECT * FROM AC_Usuario WHERE email = ?`;
+                var values = [this.email];
+                var result = yield this.execute(queue, values);
+                var hash = bcrypt.hashSync(this.senha, numSalt);
+                if (result.length == 0) {
+                    queue = `INSERT INTO AC_Usuario (usuario, datanasc, email, celular, deficiencias, senha) VALUES (?, ?, ?, ?, ?, ?)`;
+                    values = [this.nome, this.datanasc, this.email, this.celular, this.deficiencia.toString(), hash];
+                    yield this.execute(queue, values);
+                    console.log("1 dado modificado");
+                    return true;
+                }
+                else {
+                    console.log("Email já cadastrado");
+                    return false;
+                }
             }
             catch (err) {
                 console.error(`ERRO: ${err}`);
@@ -69,32 +73,36 @@ class Usuario {
     login() {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                con.connect((err) => {
-                    if (err)
-                        throw err;
-                    var sql_2 = `SELECT senha FROM AC_Usuario WHERE usuario = '123'`;
-                    con.query(sql_2, (err, result) => {
-                        console.log(`Resultado para encontrar a senha: ${result}\n`);
-                    });
-                    //var sql = `SELECT * FROM AC_Usuario WHERE usuario = '${this.nome}' AND senha = '${this.senha}'`;
-                    var sql_2 = `SELECT * FROM AC_Usuario WHERE usuario = '123' AND senha = '${this.senha}'`;
-                    con.query(sql_2, (err, result) => {
-                        if (err)
-                            throw err;
-                        if ((result.length < 1)) {
-                            console.log("Não foi possível encontrar nada no banco :'(");
-                        }
-                        else {
-                            console.log(`Login efetuado com sucesso!!\n\nNome: ${this.nome}\nSenha: ${this.senha}`);
-                        }
-                    });
-                    return false;
-                });
-            }
-            catch (err) {
+                const queue = `SELECT senha FROM AC_Usuario WHERE usuario = ?`;
+                const values = [this.nome];
+                const result = yield this.execute(queue, values);
+                if (result.length > 0) {
+                    const dbhash = result[0].senha;
+                    const match = bcrypt.compareSync(this.senha, dbhash);
+                    if (match) {
+                        console.log(`Login realizado com sucesso!!`);
+                        return true;
+                    }
+                }
+                console.log(`Login falhou`);
                 return false;
             }
-            return false;
+            catch (err) {
+                console.error(`ERRO: ${err}`);
+                return false;
+            }
+        });
+    }
+    execute(sql, values) {
+        return new Promise((resolve, reject) => {
+            this.con.query(sql, values, (err, result) => {
+                if (err) {
+                    reject(err);
+                }
+                else {
+                    resolve(result);
+                }
+            });
         });
     }
 }
@@ -106,6 +114,18 @@ app.use(body_parser_1.default.json());
 app.get('/', (req, res) => {
     res.render("index.ejs");
 });
+app.get('/cadastro', (req, res) => {
+    res.render("cadastro.ejs");
+});
+app.get('/login', (req, res) => {
+    res.render("login.ejs");
+});
+app.get('/sobrenos', (req, res) => {
+    res.render("sobrenos.ejs");
+});
+app.get('/contato', (req, res) => {
+    res.render("contato.ejs");
+});
 app.post('/cadastro', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     console.log("Got post request");
     const user = req.body.user;
@@ -116,17 +136,30 @@ app.post('/cadastro', (req, res) => __awaiter(void 0, void 0, void 0, function* 
     const password = req.body.password;
     let usuario = new Usuario(user, date, email, tel, deficiencia, password);
     let resultado = yield usuario.cadastrar();
-    if (resultado) {
+    res.render('index.ejs');
+    /*if(resultado){
         res.cookie('cadastro', true);
+        res.render('index.ejs')
+    }
+    else{
+        res.cookie('cadastro', false);
+        res.render('index.ejs')
+    }*/
+}));
+app.post('/login', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const user = req.body.user;
+    const password = req.body.password;
+    let usuario = new Usuario(user, "", "", "", [], password);
+    let resultado = yield usuario.login();
+    if (resultado) {
+        res.cookie('login', true);
         res.render('index.ejs');
     }
     else {
-        res.cookie('cadastro', false);
+        res.cookie('login', false);
         res.render('index.ejs');
     }
 }));
 app.listen(port, () => {
     console.log(`Aqui: http://localhost:${port}`);
 });
-let flavin = new Usuario('flavin do pneu', '9999', '123', 'eee', [], '123');
-flavin.login();

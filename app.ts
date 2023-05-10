@@ -9,13 +9,6 @@ const port = 3000;
 
 const numSalt = 12;
 
-var con = mysql.createConnection({
-    host: "143.106.241.3",
-    user: "cl201174",
-    password: "essaehumasenha!",
-    database: "cl201174",
-});
-
 app.use(session({
     name: "sessao",
     keys: ['key1', 'key2'],
@@ -29,6 +22,14 @@ app.use(session({
 
 
 class Usuario {
+
+    private con = mysql.createConnection({
+        host: "143.106.241.3",
+        user: "cl201174",
+        password: "essaehumasenha!",
+        database: "cl201174",
+    });
+
     nome: string;
     datanasc: string;
     email: string;
@@ -43,59 +44,66 @@ class Usuario {
         this.email = email;
         this.celular = celular;
         this.deficiencia = deficiencia;
-        this.senha = bcrypt.hashSync(senha, numSalt);
+        this.senha = senha;
     }
 
     async cadastrar(): Promise<boolean>{
         try {
-            con.connect((err : any) =>{
-                if(err) throw err;
-                var sql = `INSERT INTO AC_Usuario (usuario, datanasc, email, celular, deficiencias, senha) VALUES ('${this.nome}', '${this.datanasc}', '${this.email}', '${this.celular}', '${this.deficiencia}', '${this.senha}')`;
-                con.query(sql, (err : any, result: any) =>{
-                    if (err) throw err;
-                    console.log("1 dado modificado: ", result)
-                })
-            })
-          return true;
+            var queue = `SELECT * FROM AC_Usuario WHERE email = ?`;
+            var values = [this.email];
+            var result = await this.execute(queue, values);
+            var hash = bcrypt.hashSync(this.senha, numSalt);
+            if (result.length == 0){
+                queue = `INSERT INTO AC_Usuario (usuario, datanasc, email, celular, deficiencias, senha) VALUES (?, ?, ?, ?, ?, ?)`;
+                values = [this.nome, this.datanasc, this.email, this.celular, this.deficiencia.toString(), hash];
+                await this.execute(queue, values);
+                console.log("1 dado modificado");
+                return true;
+            }
+            else
+            {
+                console .log("Email já cadastrado");
+                return false;
+            }
         } catch (err) {
           console.error(`ERRO: ${err}`);
           return false;
         }
       }
 
-
-    //TODO: terminar login - falta conseguir comparar as senhas, do hash com a enviada pelo usuario
-    // isso seria feito por meio de uma consulta que retornaria o hash do usuario e usaria depois o método 'bcrypt.compare' para comparar as senhas e ver se bate 
     async login(): Promise<boolean>{
         try {
-            con.connect((err : any) =>{
-                if(err) throw err;
-                var sql_1 = `SELECT senha FROM AC_Usuario WHERE usuario = '123'`;
-                con.query(sql_1, (err: any, result: any) =>{
-                    console.log(`Resultado para encontrar a senha: ${result}\n`);
-                    
-                })
-                //var sql = `SELECT * FROM AC_Usuario WHERE usuario = '${this.nome}' AND senha = '${this.senha}'`;
-                var sql_2 = `SELECT * FROM AC_Usuario WHERE usuario = '123' AND senha = '${this.senha}'`;
-                con.query(sql_2, (err: any, result: any) =>{
-                    if (err) throw err;
-                    if ((result.length < 1))
-                    {
-                        console.log("Não foi possível encontrar nada no banco :'(");
-                    }
-                    else{
-                        console.log(`Login efetuado com sucesso!!\n\nNome: ${this.nome}\nSenha: ${this.senha}`)
-                    }
-                })
-                return false;       
-            })
-        } catch (err) {
+            const queue = `SELECT senha FROM AC_Usuario WHERE usuario = ?`;
+            const values = [this.nome];
+            const result = await this.execute(queue, values);
+            if (result.length > 0){
+                const dbhash = result[0].senha;
+                const match = bcrypt.compareSync(this.senha, dbhash);
+                if (match){
+                    console.log(`Login realizado com sucesso!!`);
+                    return true;
+                }
+            }
+            console.log(`Login falhou`);
+            return false;
+        }catch (err) {
+            console.error(`ERRO: ${err}`);
             return false;
         }
-        return false;
-    }
-      
-      
+    }    
+
+    private execute(sql: string, values: any[]): Promise<any[]> {
+        return new Promise((resolve, reject) => {
+            this.con.query(sql, values, (err: any, result: any) => {
+                if (err){
+                    reject(err);
+                }
+                else{
+                    resolve(result);
+                }
+            });
+        }
+    ,);}
 }
 
 app.set('view engine', 'ejs');
@@ -110,6 +118,24 @@ app.get('/', (req: Request, res: Response) => {
     res.render("index.ejs");
 });
 
+app.get('/cadastro', (req: Request, res: Response) => {
+    res.render("cadastro.ejs");
+});
+
+app.get('/login', (req: Request, res: Response) => {
+    res.render("login.ejs");
+});
+
+app.get('/sobre', (req: Request, res: Response) => {
+    res.render("sobre.ejs");
+});
+
+app.get('/contato', (req: Request, res: Response) => {
+    res.render("contato.ejs");
+});
+
+
+
 app.post('/cadastro', async (req: Request, res: Response) =>{
     console.log("Got post request");
     const user = req.body.user;
@@ -120,21 +146,35 @@ app.post('/cadastro', async (req: Request, res: Response) =>{
     const password = req.body.password;
     let usuario = new Usuario(user, date, email, tel, deficiencia, password);
     let resultado = await usuario.cadastrar();
-
-    if(resultado){
+    res.render('index.ejs');
+    /*if(resultado){
         res.cookie('cadastro', true);
         res.render('index.ejs')
     }
     else{
         res.cookie('cadastro', false);
         res.render('index.ejs')
+    }*/
+});
+
+app.post('/login', async (req: Request, res: Response) =>{
+    const user = req.body.user;
+    const password = req.body.password;
+    let usuario = new Usuario(user, "", "", "", [], password);
+    let resultado = await usuario.login();
+
+    if(resultado){
+        res.cookie('login', true);
+        res.render('index.ejs')
     }
-})
+    else{
+        res.cookie('login', false);
+        res.render('index.ejs')
+    }
+});
 
 app.listen(port, ()=>{
     console.log(`Aqui: http://localhost:${port}`);
 });
 
-let flavin = new Usuario('flavin do pneu', '9999', '123', 'eee', [], '123');
-flavin.login()
 
