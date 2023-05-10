@@ -28,7 +28,7 @@ var con = mysql.createConnection({
     database: "cl201174",
 });
 app.use(session({
-    name: "session",
+    name: "sessao",
     keys: ['key1', 'key2'],
     cookie: {
         secure: true,
@@ -45,14 +45,12 @@ class Usuario {
         this.deficiencia = deficiencia;
         this.senha = bcrypt.hashSync(senha, numSalt);
     }
-    //"INSERT INTO AC_Usuario (nome, datanasc, email, celular, deficiencia, senha) VALUES (?, ?, ?, ?, ?, ?)",
     cadastrar() {
         return __awaiter(this, void 0, void 0, function* () {
             try {
                 con.connect((err) => {
                     if (err)
                         throw err;
-                    console.log("Conectou");
                     var sql = `INSERT INTO AC_Usuario (usuario, datanasc, email, celular, deficiencias, senha) VALUES ('${this.nome}', '${this.datanasc}', '${this.email}', '${this.celular}', '${this.deficiencia}', '${this.senha}')`;
                     con.query(sql, (err, result) => {
                         if (err)
@@ -66,6 +64,37 @@ class Usuario {
                 console.error(`ERRO: ${err}`);
                 return false;
             }
+        });
+    }
+    login() {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                con.connect((err) => {
+                    if (err)
+                        throw err;
+                    var sql_2 = `SELECT senha FROM AC_Usuario WHERE usuario = '123'`;
+                    con.query(sql_2, (err, result) => {
+                        console.log(`Resultado para encontrar a senha: ${result}\n`);
+                    });
+                    //var sql = `SELECT * FROM AC_Usuario WHERE usuario = '${this.nome}' AND senha = '${this.senha}'`;
+                    var sql_2 = `SELECT * FROM AC_Usuario WHERE usuario = '123' AND senha = '${this.senha}'`;
+                    con.query(sql_2, (err, result) => {
+                        if (err)
+                            throw err;
+                        if ((result.length < 1)) {
+                            console.log("Não foi possível encontrar nada no banco :'(");
+                        }
+                        else {
+                            console.log(`Login efetuado com sucesso!!\n\nNome: ${this.nome}\nSenha: ${this.senha}`);
+                        }
+                    });
+                    return false;
+                });
+            }
+            catch (err) {
+                return false;
+            }
+            return false;
         });
     }
 }
@@ -95,8 +124,9 @@ app.post('/cadastro', (req, res) => __awaiter(void 0, void 0, void 0, function* 
         res.cookie('cadastro', false);
         res.render('index.ejs');
     }
-    console.log(usuario);
 }));
 app.listen(port, () => {
     console.log(`Aqui: http://localhost:${port}`);
 });
+let flavin = new Usuario('flavin do pneu', '9999', '123', 'eee', [], '123');
+flavin.login();

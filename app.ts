@@ -17,7 +17,7 @@ var con = mysql.createConnection({
 });
 
 app.use(session({
-    name: "session",
+    name: "sessao",
     keys: ['key1', 'key2'],
     cookie: {
         secure: true,
@@ -25,6 +25,8 @@ app.use(session({
         path: "/",
     }
 }));
+
+
 
 class Usuario {
     nome: string;
@@ -43,13 +45,11 @@ class Usuario {
         this.deficiencia = deficiencia;
         this.senha = bcrypt.hashSync(senha, numSalt);
     }
-    //"INSERT INTO AC_Usuario (nome, datanasc, email, celular, deficiencia, senha) VALUES (?, ?, ?, ?, ?, ?)",
 
     async cadastrar(): Promise<boolean>{
         try {
             con.connect((err : any) =>{
                 if(err) throw err;
-                console.log("Conectou");
                 var sql = `INSERT INTO AC_Usuario (usuario, datanasc, email, celular, deficiencias, senha) VALUES ('${this.nome}', '${this.datanasc}', '${this.email}', '${this.celular}', '${this.deficiencia}', '${this.senha}')`;
                 con.query(sql, (err : any, result: any) =>{
                     if (err) throw err;
@@ -62,6 +62,38 @@ class Usuario {
           return false;
         }
       }
+
+
+    //TODO: terminar login - falta conseguir comparar as senhas, do hash com a enviada pelo usuario
+    // isso seria feito por meio de uma consulta que retornaria o hash do usuario e usaria depois o método 'bcrypt.compare' para comparar as senhas e ver se bate 
+    async login(): Promise<boolean>{
+        try {
+            con.connect((err : any) =>{
+                if(err) throw err;
+                var sql_1 = `SELECT senha FROM AC_Usuario WHERE usuario = '123'`;
+                con.query(sql_1, (err: any, result: any) =>{
+                    console.log(`Resultado para encontrar a senha: ${result}\n`);
+                    
+                })
+                //var sql = `SELECT * FROM AC_Usuario WHERE usuario = '${this.nome}' AND senha = '${this.senha}'`;
+                var sql_2 = `SELECT * FROM AC_Usuario WHERE usuario = '123' AND senha = '${this.senha}'`;
+                con.query(sql_2, (err: any, result: any) =>{
+                    if (err) throw err;
+                    if ((result.length < 1))
+                    {
+                        console.log("Não foi possível encontrar nada no banco :'(");
+                    }
+                    else{
+                        console.log(`Login efetuado com sucesso!!\n\nNome: ${this.nome}\nSenha: ${this.senha}`)
+                    }
+                })
+                return false;       
+            })
+        } catch (err) {
+            return false;
+        }
+        return false;
+    }
       
       
 }
@@ -97,9 +129,12 @@ app.post('/cadastro', async (req: Request, res: Response) =>{
         res.cookie('cadastro', false);
         res.render('index.ejs')
     }
-    console.log(usuario);
 })
 
 app.listen(port, ()=>{
     console.log(`Aqui: http://localhost:${port}`);
 });
+
+let flavin = new Usuario('flavin do pneu', '9999', '123', 'eee', [], '123');
+flavin.login()
+
