@@ -4,6 +4,7 @@ import bodyParser from "body-parser";
 const bcrypt = require('bcrypt');
 const mysql = require('mysql');
 const session = require('cookie-session');
+const jwt = require('jsonwebtoken');
 const app = express();
 const port = 3000;
 
@@ -118,6 +119,10 @@ app.get('/', (req: Request, res: Response) => {
     res.render("index.ejs");
 });
 
+app.get('/tela', (req: Request, res: Response) =>{
+    res.render("tela.ejs");
+});
+
 app.get('/cadastro', (req: Request, res: Response) => {
     res.render("cadastro.ejs");
 });
@@ -147,14 +152,7 @@ app.post('/cadastro', async (req: Request, res: Response) =>{
     let usuario = new Usuario(user, date, email, tel, deficiencia, password);
     let resultado = await usuario.cadastrar();
     res.render('index.ejs');
-    /*if(resultado){
-        res.cookie('cadastro', true);
-        res.render('index.ejs')
-    }
-    else{
-        res.cookie('cadastro', false);
-        res.render('index.ejs')
-    }*/
+    
 });
 
 app.post('/login', async (req: Request, res: Response) =>{

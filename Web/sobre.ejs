@@ -1,5 +1,4 @@
 <html lang="pt-br">
-
 <head>
   <meta charset="UTF=8">
   <meta hhtp-equiv="X-UA-Compatible" content="IE=edge">
@@ -14,13 +13,10 @@
   <link rel="stylesheet" type="text/css" href="style.css">
   <style class="text/css">
     body {
-      background-color: rgb(230, 223, 210);
+      background-color: #e6dfd2;
     }
-
-    container {
-      display: flex;
-      justify-content: space-evenly;
-      align-items: center;
+    .container{
+      padding: 0;
     }
   </style>
 </head>
@@ -29,7 +25,7 @@
   <!--Começo NavBar-->
   <nav class="navbar navbar-expand-lg navbar-dark" style="background-color: rgb(102, 155, 188);">
     <div class="container-fluid">
-      <a class="navbar-brand" href="index.html"><img src="imagens/Logo3.png" height="40px" width="40px"></a>
+      <a class="navbar-brand" href="/"><img src="imagens/Logo3.png" height="40px" width="40px"></a>
       <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent"
         aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
@@ -37,20 +33,20 @@
       <div class="collapse navbar-collapse" id="navbarSupportedContent">
         <ul class="navbar-nav me-auto mb-2 mb-lg-0">
           <li class="nav-item">
-            <a class="nav-link" aria-current="page" href="index.html"><span lang="en-us">Home</span></a>
+            <a class="nav-link" aria-current="page" href="/"><span lang="en-us">Home</span></a>
           </li>
           <li class="nav-item">
-            <a class="nav-link active" href="sobrenos.html">Sobre nós</a>
+            <a class="nav-link active" href="/sobre">Sobre nós</a>
           </li>
           <li class="nav-item">
-            <a class="nav-link" href="contato.html">Contato</a>
+            <a class="nav-link" href="/contato">Contato</a>
           </li>
           <li class="nav-item">
-            <a class="nav-link disabled" href="contato.html">Documentos</a>
+            <a class="nav-link disabled" href="/documento">Documentos</a>
           </li>
         </ul>
         <form class="d-flex" role="search">
-          <a class="btn btn-light" role="button" type="submit" href="tela.html">Log In</a>
+          <a class="btn btn-light" role="button" type="submit" href="/tela">Log In</a>
         </form>
       </div>
     </div>
@@ -58,75 +54,114 @@
   <!--Final NavBar-->
 
   <!--Container da História-->
-  <h2 class="display-2 text-center">Aplicativo <span lang="en-us">AccessCity</span></h2>
+  <h1 class="display-2 text-center">Sobre nós</h1>
   
-  <!--<div class="row justify-content-center">
-    <div class="col-md-5 col-sm-4 d-grid">
-      <div class="row pt-5 mgB-4" style="align-items: center;">
-        <h3 class="display-2 text-center" style="text-transform: uppercase;">unicamp</h2>
-          <p class="pt-3" style="text-align: center;font-size: 20px;">Este aplicativo é um trabalho de
-            conclusão de curso do curso de Desenvolvimento de Sistemas do Colégio Técnico de Limeira da UNICAMP
-            (COTIL).</p>
-      </div>
-    </div>
-    <div class="col-md-6 ms-md-auto">
-      <h2 class="display-2 text-center">Aplicativo <span lang="en-us">AccessCity</span></h2>
-      <p class="pt-3" style="text-align: center;font-size: 20px;"><span lang="en-us">AccessCity</span> é
-        um aplicativo que tem por objetivo tornar as cidades brasileiras mais acessíveis para pessoas com deficiência
-        ou
-        qualquer outra dificuldade similar. É possível saber as rotas de ônibus acessíveis disponíveis na sua cidade e
-        os requisitos de acessibilidade cumpridos por cada estabelecimento, além de poder fazer o upload de documentos
-        como laudos e carteirinhas de passe livre para um acesso mais rápido e fácil!</p>
-    </div>
-  </div>-->
-  <!--Final container Equipe-->
-
-  <!--Container da Equipe-->
-  <div class="container-fluid wholeContainer mgT-4 text-center">
-    <h1 class="display-1 text-center texto-branco mgT-2">Nossa Equipe</h1>
-    <div class="container">
-      <div class="row pt-4 mgB-4">
-        <!--1º card - lua-->
-        <div class=" col-md-3 col-sm-3">
-          <div class="card">
-            <img src="imagens/equipe/yo.jfif" class="card-img-top" alt=" Foto de Luanna S. P.">
-            <div class="card-body" style="height:9rem;">
-              <h5 class="card-title texto-central">Luanna Sachinelli Paggiaro</h5>
-              <p class="card-text texto-central">Idealizadora e gerente do projeto <span lang="en-us">AccessCity.</span>
-              </p>
-            </div>
+  <!--Container História-->
+  <div class="container-fluid d-flex pt-4">
+    <div class="row flex-fill justify-content-evenly">
+      <div class="col-md-6">
+        <div class="row justify-content-center">
+          <div class="col-md-12">
+            <h2 class="display-4 text-center">O que é <span lang="en-us">AccessCity</span>?</h2>
           </div>
-        </div><br>
-        <!--2º card - nat-->
-        <div class="col-md-3 col-sm-3">
-          <div class="card">
-            <img src="imagens/equipe/nat.png" class="card-img-top" alt="Foto de Natália Carvalho">
-            <div class="card-body" style="height:9rem;">
-              <h5 class="card-title texto-central">Natália Carvalho</h5>
-              <p class="card-text texto-central">Pessoa com deficiência e desenvolvedora.</p>
-            </div>
-          </div>
-        </div><br>
-        <!--3º card- heitor-->
-        <div class="col-md-3 col-sm-3">
-          <div class="card">
-            <img src="imagens/equipe/heitor.jpg" class="card-img-top" alt=" Foto de Heitor Gomes de Oliveira">
-            <div class="card-body" style="height:9rem;">
-              <h5 class="card-title texto-central">Heitor Gomes de Oliveira</h5>
-              <p class="card-text texto-central">Desenvolvedor <span lang="en-us">back-end.</span></p>
-            </div>
-          </div>
-        </div><br>
-        <!--4º card - cat-->
-        <div class="col-md-3 col-sm-3">
-          <div class="card">
-            <img src="imagens/equipe/cat.png" class="card-img-top" alt="Foto de Catarina Fagotti Bonifácio">
-            <div class="card-body" style="height:9rem;">
-              <h5 class="card-title texto-central">Catarina Fagotti Bonifácio</h5>
-              <p class="card-text texto-central">Desenvolvedora <span lang="en-us">back-end.</span></p>
-            </div>
+          <div class="col-md-10">
+            <p class="pt-4 text-center"><span lang="en-us">AccessCity</span> é um aplicativo <span lang="en-us">mobile</span> que tem
+            como objetivo tornar as cidades brasileiras mais acessíveis. A aplicação auxilia no uso de transporte público, 
+            utiliza filtros para avaliação de estabelecimentos baseados em sua acessibilidade (restaurantes, parques, 
+            escolas, etc) e possui scanner e atalhos para armazenar uma cópia do passe livre e outros documentos importantes
+            como laudos.</p>
           </div>
         </div>
+      </div>
+      <div class="col-md-5 align-items-start ms-auto">
+        <img src="imagens/freepik.png" height="400px">
+      </div>
+    </div>
+  </div>
+
+  <div class="container-fluid d-flex justify-content-center">
+    <div class="row flex-fill justify-content-evenly align-items-start">
+      <div class="col-md-4 mgB-3">
+        <img src="imagens/freepik2.png" height="400px">
+      </div>
+      <div class="col-md-6">
+        <div class="row justify-content-center ms-auto">
+          <div class="col-md-12">
+            <h2 class="display-4 text-center">Como ele funciona?</h2>
+          </div>
+          <div class="col-md-10">
+            <p class="pt-4 text-center">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod 
+              tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation 
+              ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in 
+              voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non 
+              proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!--Fim container história-->
+
+  <!--Container da Equipe-->
+  <div class="container-fluid wholeContainer">
+    <div class="row">
+      <h1 class="display-1 text-center texto-branco">Nossa Equipe</h1>
+    </div>
+      <div class="row">
+      <div class="box">
+        <!--1º Card - Lua-->
+        <div class="col-md-3">
+          <div class="card">
+              <div class="imgBx">
+                  <img src="imagens/equipe/yo.jfif">
+              </div>
+              <div class="content">
+                  <div class="details">
+                      <h2>Luanna Sachinelli Paggiaro<br><span>Project Manager</span></h2>
+                  </div>
+              </div>
+          </div>
+        </div>
+        <!--2º Card - Nat-->
+        <div class="col-md-3">
+          <div class="card">
+              <div class="imgBx">
+                  <img src="imagens/equipe/nat.png">
+              </div>
+              <div class="content">
+                  <div class="details">
+                      <h2>Natália Carvalho<br><span>Programadora e PCD</span></h2>
+                  </div>
+              </div>
+          </div>
+        </div>
+        <!--3º Card - Heitor-->
+        <div class="col-md-3">
+          <div class="card">
+              <div class="imgBx">
+                  <img src="imagens/equipe/heitor.jpg">
+              </div>
+              <div class="content">
+                  <div class="details">
+                      <h2>Heitor Gomes de Oliveira<br><span>Programador</span></h2>
+                  </div>
+              </div>
+          </div>
+        </div>
+        <!--4º Card - Cat-->
+        <div class="col-md-3">
+          <div class="card">
+              <div class="imgBx">
+                  <img src="imagens/equipe/cat.png">
+              </div>
+              <div class="content">
+                  <div class="details">
+                      <h2>Catarina Fagotti Bonifácio<br><span>Programadora</span></h2>
+                  </div>
+              </div>
+          </div>
+        </div>
+        <!--fim cards-->
       </div>
     </div>
   </div>

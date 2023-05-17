@@ -114,14 +114,17 @@ app.use(body_parser_1.default.json());
 app.get('/', (req, res) => {
     res.render("index.ejs");
 });
+app.get('/tela', (req, res) => {
+    res.render("tela.ejs");
+});
 app.get('/cadastro', (req, res) => {
     res.render("cadastro.ejs");
 });
 app.get('/login', (req, res) => {
     res.render("login.ejs");
 });
-app.get('/sobrenos', (req, res) => {
-    res.render("sobrenos.ejs");
+app.get('/sobre', (req, res) => {
+    res.render("sobre.ejs");
 });
 app.get('/contato', (req, res) => {
     res.render("contato.ejs");
