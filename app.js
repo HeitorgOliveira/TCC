@@ -18,18 +18,11 @@ const body_parser_1 = __importDefault(require("body-parser"));
 const bcrypt = require('bcrypt');
 const mysql = require('mysql');
 const session = require('cookie-session');
+const jwt = require('jsonwebtoken');
+const { v4: uuidv4 } = require('uuid');
 const app = (0, express_1.default)();
 const port = 3000;
 const numSalt = 12;
-app.use(session({
-    name: "sessao",
-    keys: ['key1', 'key2'],
-    cookie: {
-        secure: true,
-        httpOnly: true,
-        path: "/",
-    }
-}));
 class Usuario {
     constructor(nome, datanasc, email, celular, deficiencia, senha) {
         this.con = mysql.createConnection({
@@ -80,7 +73,6 @@ class Usuario {
                     const dbhash = result[0].senha;
                     const match = bcrypt.compareSync(this.senha, dbhash);
                     if (match) {
-                        console.log(`Login realizado com sucesso!!`);
                         return true;
                     }
                 }
@@ -140,14 +132,6 @@ app.post('/cadastro', (req, res) => __awaiter(void 0, void 0, void 0, function* 
     let usuario = new Usuario(user, date, email, tel, deficiencia, password);
     let resultado = yield usuario.cadastrar();
     res.render('index.ejs');
-    /*if(resultado){
-        res.cookie('cadastro', true);
-        res.render('index.ejs')
-    }
-    else{
-        res.cookie('cadastro', false);
-        res.render('index.ejs')
-    }*/
 }));
 app.post('/login', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const user = req.body.user;
@@ -155,8 +139,14 @@ app.post('/login', (req, res) => __awaiter(void 0, void 0, void 0, function* () 
     let usuario = new Usuario(user, "", "", "", [], password);
     let resultado = yield usuario.login();
     if (resultado) {
-        res.cookie('login', true);
-        res.render('index.ejs');
+        const foo = { id: uuidv4(), name: user, role: 'user' };
+        const token = jwt.sign(foo, 'secret');
+        res.cookie('token', token, {
+            httpOnly: true,
+            secure: true,
+            sameSite: 'strict'
+        });
+        console.log(`Login realizado com sucesso!!`);
     }
     else {
         res.cookie('login', false);

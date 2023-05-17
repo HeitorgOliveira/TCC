@@ -1,5 +1,6 @@
 import path from "path";
 import express, { Request, Response, request } from 'express';
+import { v4 as uuidv4 } from 'uuid';
 import bodyParser from "body-parser";
 const bcrypt = require('bcrypt');
 const mysql = require('mysql');
@@ -9,17 +10,12 @@ const app = express();
 const port = 3000;
 
 const numSalt = 12;
+app.set('view engine', 'ejs');
+app.set('views', path.join(__dirname, 'Web'));
 
-app.use(session({
-    name: "sessao",
-    keys: ['key1', 'key2'],
-    cookie: {
-        secure: true,
-        httpOnly: true,
-        path: "/",
-    }
-}));
-
+app.use(express.static(path.join(__dirname, 'Web')));
+app.use(bodyParser.urlencoded({extended: true}));
+app.use(bodyParser.json());
 
 
 class Usuario {
@@ -81,7 +77,6 @@ class Usuario {
                 const dbhash = result[0].senha;
                 const match = bcrypt.compareSync(this.senha, dbhash);
                 if (match){
-                    console.log(`Login realizado com sucesso!!`);
                     return true;
                 }
             }
@@ -106,13 +101,6 @@ class Usuario {
         }
     ,);}
 }
-
-app.set('view engine', 'ejs');
-app.set('views', path.join(__dirname, 'Web'));
-
-app.use(express.static(path.join(__dirname, 'Web')));
-app.use(bodyParser.urlencoded({extended: true}));
-app.use(bodyParser.json());
 
 
 app.get('/', (req: Request, res: Response) => {
@@ -162,8 +150,15 @@ app.post('/login', async (req: Request, res: Response) =>{
     let resultado = await usuario.login();
 
     if(resultado){
-        res.cookie('login', true);
-        res.render('index.ejs')
+        const foo = {id: uuidv4(), name: user, role: 'user'};
+        const token = jwt.sign(foo, 'secret');
+        res.cookie(
+            'token', token, {
+                httpOnly: true,
+                secure: true,
+                sameSite: 'strict'
+            });
+        console.log(`Login realizado com sucesso!!`);
     }
     else{
         res.cookie('login', false);
