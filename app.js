@@ -14,15 +14,20 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const path_1 = __importDefault(require("path"));
 const express_1 = __importDefault(require("express"));
+//import { v4 as uuidv4 } from 'uuid';
 const body_parser_1 = __importDefault(require("body-parser"));
 const bcrypt = require('bcrypt');
 const mysql = require('mysql');
 const session = require('cookie-session');
 const jwt = require('jsonwebtoken');
-const { v4: uuidv4 } = require('uuid');
 const app = (0, express_1.default)();
 const port = 3000;
 const numSalt = 12;
+app.set('view engine', 'ejs');
+app.set('views', path_1.default.join(__dirname, 'Web'));
+app.use(express_1.default.static(path_1.default.join(__dirname, 'Web')));
+app.use(body_parser_1.default.urlencoded({ extended: true }));
+app.use(body_parser_1.default.json());
 class Usuario {
     constructor(nome, datanasc, email, celular, deficiencia, senha) {
         this.con = mysql.createConnection({
@@ -98,11 +103,6 @@ class Usuario {
         });
     }
 }
-app.set('view engine', 'ejs');
-app.set('views', path_1.default.join(__dirname, 'Web'));
-app.use(express_1.default.static(path_1.default.join(__dirname, 'Web')));
-app.use(body_parser_1.default.urlencoded({ extended: true }));
-app.use(body_parser_1.default.json());
 app.get('/', (req, res) => {
     res.render("index.ejs");
 });
@@ -127,7 +127,19 @@ app.post('/cadastro', (req, res) => __awaiter(void 0, void 0, void 0, function* 
     const date = req.body.date;
     const email = req.body.email;
     const tel = req.body.tel;
-    const deficiencia = req.body.deficiencia;
+    const deficiencia = [];
+    if (req.body.motora === 'on') {
+        deficiencia.push('motora');
+    }
+    if (req.body.visual === 'on') {
+        deficiencia.push('visual');
+    }
+    if (req.body.auditiva === 'on') {
+        deficiencia.push('auditiva');
+    }
+    if (req.body.outros === 'on') {
+        deficiencia.push('outro');
+    }
     const password = req.body.password;
     let usuario = new Usuario(user, date, email, tel, deficiencia, password);
     let resultado = yield usuario.cadastrar();
@@ -138,14 +150,15 @@ app.post('/login', (req, res) => __awaiter(void 0, void 0, void 0, function* () 
     const password = req.body.password;
     let usuario = new Usuario(user, "", "", "", [], password);
     let resultado = yield usuario.login();
-    if (resultado) {
-        const foo = { id: uuidv4(), name: user, role: 'user' };
+    if (resultado) { /*
+        const foo = {id: uuidv4(), name: user, role: 'user'};
         const token = jwt.sign(foo, 'secret');
-        res.cookie('token', token, {
-            httpOnly: true,
-            secure: true,
-            sameSite: 'strict'
-        });
+        res.cookie(
+            'token', token, {
+                httpOnly: true,
+                secure: true,
+                sameSite: 'strict'
+            });*/
         console.log(`Login realizado com sucesso!!`);
     }
     else {

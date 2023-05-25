@@ -1,6 +1,6 @@
 import path from "path";
 import express, { Request, Response, request } from 'express';
-import { v4 as uuidv4 } from 'uuid';
+//import { v4 as uuidv4 } from 'uuid';
 import bodyParser from "body-parser";
 const bcrypt = require('bcrypt');
 const mysql = require('mysql');
@@ -31,10 +31,10 @@ class Usuario {
     datanasc: string;
     email: string;
     celular: string;
-    deficiencia: [];
+    deficiencia: string[];
     senha: string;
 
-    constructor(nome: string, datanasc: string, email: string, celular: string, deficiencia: [], senha: string)
+    constructor(nome: string, datanasc: string, email: string, celular: string, deficiencia: string[], senha: string)
     {
         this.nome = nome;
         this.datanasc = datanasc;
@@ -135,7 +135,24 @@ app.post('/cadastro', async (req: Request, res: Response) =>{
     const date = req.body.date;
     const email = req.body.email;
     const tel = req.body.tel;
-    const deficiencia = req.body.deficiencia;
+    const deficiencia = [];
+
+    if (req.body.motora === 'on')
+    {
+        deficiencia.push('motora');
+    }
+    if (req.body.visual === 'on')
+    {
+        deficiencia.push('visual')
+    }
+    if (req.body.auditiva === 'on')
+    {
+        deficiencia.push('auditiva');
+    }
+    if (req.body.outros === 'on')
+    {
+        deficiencia.push('outro');
+    }
     const password = req.body.password;
     let usuario = new Usuario(user, date, email, tel, deficiencia, password);
     let resultado = await usuario.cadastrar();
@@ -149,7 +166,7 @@ app.post('/login', async (req: Request, res: Response) =>{
     let usuario = new Usuario(user, "", "", "", [], password);
     let resultado = await usuario.login();
 
-    if(resultado){
+    if(resultado){/*
         const foo = {id: uuidv4(), name: user, role: 'user'};
         const token = jwt.sign(foo, 'secret');
         res.cookie(
@@ -157,7 +174,7 @@ app.post('/login', async (req: Request, res: Response) =>{
                 httpOnly: true,
                 secure: true,
                 sameSite: 'strict'
-            });
+            });*/
         console.log(`Login realizado com sucesso!!`);
     }
     else{
