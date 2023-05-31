@@ -70,8 +70,8 @@ class Usuario {
 
     async login(): Promise<boolean>{
         try {
-            const queue = `SELECT senha FROM AC_Usuario WHERE usuario = ?`;
-            const values = [this.nome];
+            const queue = `SELECT senha FROM AC_Usuario WHERE email = ?`;
+            const values = [this.email];
             const result = await this.execute(queue, values);
             if (result.length > 0){
                 const dbhash = result[0].senha;
@@ -156,14 +156,16 @@ app.post('/cadastro', async (req: Request, res: Response) =>{
     const password = req.body.password;
     let usuario = new Usuario(user, date, email, tel, deficiencia, password);
     let resultado = await usuario.cadastrar();
-    res.render('index.ejs');
-    
+    if (resultado)
+    {
+        res.render('index.ejs');
+    }    
 });
 
 app.post('/login', async (req: Request, res: Response) =>{
-    const user = req.body.user;
+    const email = req.body.email;
     const password = req.body.password;
-    let usuario = new Usuario(user, "", "", "", [], password);
+    let usuario = new Usuario("", "", email, "", [], password);
     let resultado = await usuario.login();
 
     if(resultado){/*
@@ -175,11 +177,12 @@ app.post('/login', async (req: Request, res: Response) =>{
                 secure: true,
                 sameSite: 'strict'
             });*/
+            res.render('index.ejs');
         console.log(`Login realizado com sucesso!!`);
     }
     else{
         res.cookie('login', false);
-        res.render('index.ejs')
+        res.render('index.ejs');
     }
 });
 
