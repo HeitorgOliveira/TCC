@@ -14,6 +14,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const path_1 = __importDefault(require("path"));
 const express_1 = __importDefault(require("express"));
+const date_fns_1 = require("date-fns");
 //import { v4 as uuidv4 } from 'uuid';
 const body_parser_1 = __importDefault(require("body-parser"));
 const bcrypt = require('bcrypt');
@@ -71,8 +72,8 @@ class Usuario {
     login() {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const queue = `SELECT senha FROM AC_Usuario WHERE usuario = ?`;
-                const values = [this.nome];
+                const queue = `SELECT senha FROM AC_Usuario WHERE email = ?`;
+                const values = [this.email];
                 const result = yield this.execute(queue, values);
                 if (result.length > 0) {
                     const dbhash = result[0].senha;
@@ -122,11 +123,39 @@ app.get('/contato', (req, res) => {
     res.render("contato.ejs");
 });
 app.post('/cadastro', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    console.log("Got post request");
     const user = req.body.user;
     const date = req.body.date;
+    try {
+        const idadeRegex = /^(\d{2})\/(\d{2})\/(\d{4})$/;
+        if (!date.match(idadeRegex)) {
+            console.error("Formato inválido para idade");
+            res.render('index.ejs');
+            return;
+        }
+        let diferenca = (0, date_fns_1.differenceInYears)(new Date(), date);
+        if (diferenca < 18) {
+            console.error("Idade inválida");
+            res.render('index.ejs');
+            return;
+        }
+    }
+    catch (err) {
+        console.error(err);
+    }
+    const regexEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     const email = req.body.email;
+    if (!regexEmail.test(email)) {
+        console.error("E-mail inválido");
+        res.render('index.ejs');
+        return;
+    }
+    const regexTelefone = /^\d{2} \d{5}-\d{4}$/;
     const tel = req.body.tel;
+    if (!regexTelefone.test(tel)) {
+        console.error("Telefone inválido");
+        res.render('index.ejs');
+        return;
+    }
     const deficiencia = [];
     if (req.body.motora === 'on') {
         deficiencia.push('motora');
@@ -143,12 +172,14 @@ app.post('/cadastro', (req, res) => __awaiter(void 0, void 0, void 0, function* 
     const password = req.body.password;
     let usuario = new Usuario(user, date, email, tel, deficiencia, password);
     let resultado = yield usuario.cadastrar();
-    res.render('index.ejs');
+    if (resultado) {
+        res.render('index.ejs');
+    }
 }));
 app.post('/login', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const user = req.body.user;
+    const email = req.body.email;
     const password = req.body.password;
-    let usuario = new Usuario(user, "", "", "", [], password);
+    let usuario = new Usuario("", "", email, "", [], password);
     let resultado = yield usuario.login();
     if (resultado) { /*
         const foo = {id: uuidv4(), name: user, role: 'user'};
@@ -159,6 +190,7 @@ app.post('/login', (req, res) => __awaiter(void 0, void 0, void 0, function* () 
                 secure: true,
                 sameSite: 'strict'
             });*/
+        res.render('index.ejs');
         console.log(`Login realizado com sucesso!!`);
     }
     else {

@@ -1,5 +1,6 @@
 import path from "path";
 import express, { Request, Response, request } from 'express';
+import { differenceInYears } from 'date-fns';
 //import { v4 as uuidv4 } from 'uuid';
 import bodyParser from "body-parser";
 const bcrypt = require('bcrypt');
@@ -130,13 +131,44 @@ app.get('/contato', (req: Request, res: Response) => {
 
 
 app.post('/cadastro', async (req: Request, res: Response) =>{
-    console.log("Got post request");
     const user = req.body.user;
     const date = req.body.date;
+    try{
+        const idadeRegex = /^(\d{2})\/(\d{2})\/(\d{4})$/;
+        if (!date.match(idadeRegex))
+        {
+            console.error("Formato inválido para idade");
+            res.render('index.ejs');
+            return
+        }
+        let diferenca = differenceInYears(new Date(), date)
+        if (diferenca < 18)
+        {
+            console.error("Idade inválida");
+            res.render('index.ejs');
+            return
+        }
+    }
+    catch(err){
+        console.error(err);
+    }
+    const regexEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     const email = req.body.email;
+    if (!regexEmail.test(email))
+    {
+        console.error("E-mail inválido");
+        res.render('index.ejs');
+        return
+    }
+    const regexTelefone = /^\d{2} \d{5}-\d{4}$/;
     const tel = req.body.tel;
+    if (!regexTelefone.test(tel))
+    {
+        console.error("Telefone inválido");
+        res.render('index.ejs');
+        return
+    }
     const deficiencia = [];
-
     if (req.body.motora === 'on')
     {
         deficiencia.push('motora');
