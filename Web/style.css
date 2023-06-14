@@ -9,6 +9,13 @@
     transform: translate(-50%, -50%);
 }
 
+.containerCard{    
+    border-radius: 20px;
+    background-color: #e6dfd2;
+    border: 2px solid #111;
+    align-self: center;
+}
+
 .containerFit {
     position: relative;
     width: 100%;
@@ -21,20 +28,6 @@
     padding: 5px;
     margin-top: 4%;
     width: 60%;
-}
-
-.wholeContainer{
-    height: 110vh;
-    width: 100%;
-    background: #2a3050;
-    padding: 5px;
-    border-bottom: 2px;
-    border-color: black;
-    align-items: center;
-    justify-content: center;
-    box-sizing: border-box;
-    display: flex;
-    flex-wrap: wrap;
 }
 
 .containerCadastro{
@@ -60,16 +53,122 @@
     text-align: center;
 }
 
-/*CARDS*/
-.box{
+/*CARD CELULAR*/
+.cont{
     position: relative;
-    width: 1280px;
     display: flex;
     justify-content: center;
     align-items: center;
-    flex-wrap: wrap;
+}
+.cont .car{
+    position: relative;
+    width: 550px;
+    height: 350px;
+    margin: 20px;
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    background: linear-gradient(45deg, #edede9, #e3d5ca, #f5ebe0);
+    transition: 0.5s;
+    border: #111 2px solid;
+}
+.cont .car img{
+    position: absolute;
+    bottom: 0;
+    height: 320px;
+    left: 50%;
+    transform: translateX(-50%);
+    transition: 0.5s;
 }
 
+.cont .car:hover img{
+    left: 75%;
+    height: 350px;
+}
+
+.cont .car .conteudo{
+    padding: 20px 20px 20px 40px;
+    position: relative;
+    width: 50%;
+    left:20%;
+    transition: 0.5s;
+    opacity: 0;
+    visibility: hidden;
+}
+
+.cont .car:hover .conteudo{
+    left: 0;
+    opacity: 1;
+    visibility: visible;
+}
+
+.cont .car .conteudo h2{
+    text-transform: uppercase;
+    font-size: 2.2em;
+    line-height: 1em;
+}
+
+.cont .car .conteudo a{
+    position: relative;
+    color: #111;
+    background: #fff;
+    display: inline-block;
+    padding: 10px 20px;
+    margin-top: 10px;
+    text-decoration: none;
+    font-weight: 700;
+}
+
+@media (max-width: 991px){
+    .cont .car{
+        width: auto;
+        max-width: 600px;
+        align-items: flex-start;
+    }
+
+    .cont .car:hover{
+        height: 600px;
+    }
+
+    .cont .car:hover img{
+        left: 50%;
+        height: 350px;
+    }
+
+    .cont .car .conteudo{
+        width: 100%;
+        left: 0;
+        padding: 20px;
+    }
+}
+
+@media (max-width: 767px){
+    .cont{
+        flex-direction: column;
+    }
+    .cont .car{
+        margin: 40px 20px;
+    }
+}
+
+@media (max-width: 420px){
+    .cont .car .conteudo{
+        padding: 30px;
+    }
+    .cont .car:hover img{
+        height: 300px;
+    }
+}
+
+/*CARD EQUIPE*/
+.box{
+    position: relative;
+    width: 1280px;
+    justify-content: center;
+    align-items: center;
+    display: flex;
+    flex-wrap: wrap;
+}
 .box .card{
     position: relative;
     width: 300px;
@@ -176,6 +275,174 @@
     background-size: 100%;
     transition: all 0s;
     box-shadow: 0 0 1rem hsla(0, 100%, 100%, 0.8);
+}
+
+/*FOOTER*/
+footer{
+    position: relative;
+    width: 100%;
+    height: auto;
+    padding: 50px 100px;
+    background-color: #111;
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+}
+
+footer .containerF{
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    flex-direction: row;
+}
+
+footer .containerF .sec {
+    margin-right: 30px;
+}
+
+footer .containerF .sec.aboutus{
+    width: 40%;
+}
+
+footer .containerF h2{
+    position: relative;
+    color: #fff;
+    font-weight: 500;
+    margin-bottom: 25px;
+}
+
+footer .containerF h2:before{
+    content: '';
+    position: absolute;
+    bottom: -5px;
+    left: 0;
+    width: 50px;
+    height: 2px;
+    background: #669bbc;
+}
+
+footer p{
+    color: #999;
+
+}
+
+.sci{
+    margin-top: 20px;
+    display: flex;
+}
+
+.sci li{
+    list-style: none;
+}
+
+.sci li a{
+    display: inline-block;
+    width: 40px;
+    height: 40px;
+    background-color: #222;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-right: 10px;
+    text-decoration: none;
+    border-radius: 4px;
+}
+
+.sci li a:hover{
+    background-color: #669bbc;
+}
+
+.sci li a .bi{
+    color: #fff;
+    font-size: 20px;
+}
+
+.quickLinks{
+    position: relative;
+    width: 25%;
+}
+
+.quicklinks{
+    list-style: none;
+}
+
+.quicklinks ul li a{
+    color: #999;
+    text-decoration: none;
+    margin-bottom: 10px;
+    display: inline-block;
+}
+
+.quicklinks ul li a:hover{
+    color: #fff;
+}
+
+.contact{
+    width: calc(35% - 60px);
+    margin-right: 0 !important;
+}
+
+.contact .info{
+    position: relative;
+}
+
+.contact .info li{
+    display: flex;
+    margin-bottom: 16px;
+}
+
+.contact .info li span:nth-child(1){
+    color: #fff;
+    font-size: 20px;
+    margin-right: 10px;
+}
+
+.contact .info li span{
+    color: #999;
+}
+
+.contact .info li a{
+    color: #999;
+    text-decoration: none;
+}
+
+.contact .info li a:hover{
+    color: #fff;
+}
+
+footer ul .quickinks{
+    padding: 0px 0px 0px 10px !important;
+}
+
+footer ul{
+    padding: 0;
+}
+
+.copyrightText{
+    width: 100%;
+    background-color: #181818;
+    padding: 8px 100px;
+    text-align: center;
+    color: #999;
+}
+
+@media (max-width: 991px){
+    footer{
+        padding: 40px;
+    }
+    footer .containerF{
+        flex-direction: column;
+    }
+    footer .containerF .sec{
+        margin-right: 0;
+        margin-bottom: 40px;
+    }
+    footer .containerF .sec.aboutus,.quickLinks,.contact{
+        width: 100%;
+    }
+    .copyrightText{
+        padding: 8px 40px;
+    }
 }
 
 /*Classes de margem*/

@@ -9,11 +9,9 @@ const session = require('cookie-session');
 const jwt = require('jsonwebtoken');
 const app = express();
 const port = 3000;
-
 const numSalt = 12;
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'Web'));
-
 app.use(express.static(path.join(__dirname, 'Web')));
 app.use(bodyParser.urlencoded({extended: true}));
 app.use(bodyParser.json());
@@ -71,7 +69,7 @@ class Usuario {
 
     async login(): Promise<boolean>{
         try {
-            const queue = `SELECT senha FROM AC_Usuario WHERE email = ?`;
+            const queue = `SELECT * FROM AC_Usuario WHERE email = ?`;
             const values = [this.email];
             const result = await this.execute(queue, values);
             if (result.length > 0){
@@ -129,28 +127,28 @@ app.get('/contato', (req: Request, res: Response) => {
 });
 
 
-
 app.post('/cadastro', async (req: Request, res: Response) =>{
     const user = req.body.user;
     const date = req.body.date;
-    try{
-        const idadeRegex = /^(\d{2})\/(\d{2})\/(\d{4})$/;
-        if (!date.match(idadeRegex))
-        {
-            console.error("Formato inválido para idade");
-            res.render('index.ejs');
-            return
-        }
-        let diferenca = differenceInYears(new Date(), date)
-        if (diferenca < 18)
-        {
-            console.error("Idade inválida");
-            res.render('index.ejs');
-            return
-        }
+    try {
+    const idadeRegex = /^(\d{4})\-(\d{2})\-(\d{2})$/;
+    if (!date.match(idadeRegex)) {
+        console.error("Formato inválido para idade");
+        res.render('index.ejs');
+        return; 
     }
-    catch(err){
-        console.error(err);
+
+    const [year, month, day] = date.split('-').map(Number);
+    const idade = new Date(year, month - 1, day);
+    const diffInYears = differenceInYears(new Date(), idade);
+
+    if ((diffInYears < 18) || (diffInYears > 120)){
+        console.error("Idade inválida");
+        res.render('index.ejs');
+        return;
+    }
+    } catch (err) {
+    console.error(err);
     }
     const regexEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     const email = req.body.email;

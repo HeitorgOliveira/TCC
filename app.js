@@ -72,7 +72,7 @@ class Usuario {
     login() {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const queue = `SELECT senha FROM AC_Usuario WHERE email = ?`;
+                const queue = `SELECT * FROM AC_Usuario WHERE email = ?`;
                 const values = [this.email];
                 const result = yield this.execute(queue, values);
                 if (result.length > 0) {
@@ -126,14 +126,16 @@ app.post('/cadastro', (req, res) => __awaiter(void 0, void 0, void 0, function* 
     const user = req.body.user;
     const date = req.body.date;
     try {
-        const idadeRegex = /^(\d{2})\/(\d{2})\/(\d{4})$/;
+        const idadeRegex = /^(\d{4})\-(\d{2})\-(\d{2})$/;
         if (!date.match(idadeRegex)) {
             console.error("Formato inválido para idade");
             res.render('index.ejs');
             return;
         }
-        let diferenca = (0, date_fns_1.differenceInYears)(new Date(), date);
-        if (diferenca < 18) {
+        const [year, month, day] = date.split('-').map(Number);
+        const idade = new Date(year, month - 1, day);
+        const diffInYears = (0, date_fns_1.differenceInYears)(new Date(), idade);
+        if ((diffInYears < 18) || (diffInYears > 120)) {
             console.error("Idade inválida");
             res.render('index.ejs');
             return;

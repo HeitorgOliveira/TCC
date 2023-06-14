@@ -1,49 +1,48 @@
+//import 'dart:js';
+import 'package:accesscity/configuracoes/configuracoes.dart';
+import 'package:accesscity/documentos/documentos.dart';
+import 'package:accesscity/login.dart';
+import 'package:accesscity/lugar.dart';
+import 'package:accesscity/onibus.dart';
+import 'package:accesscity/perfil/perfil.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_map/flutter_map.dart';
-import 'package:latlong2/latlong.dart';
 
 
 void main() {
-  runApp(const MyApp());
+  runApp(MyApp());
 }
-class MyApp extends StatelessWidget {
-  const MyApp({super.key});
 
-  // This widget is the root of your application.
+class Variaveis{
+  static Color corAzul = Color.fromARGB(255, 9, 102, 136);
+  static Color corAzul2 = Color.fromARGB(255, 71, 122, 143);
+  static Color corBg = Color.fromARGB(255, 196, 203, 202);
+  static Color corBranca = Colors.white;
+  static Color corPreta = Colors.black;
+  static Color corFonte = Colors.white;
+}
+
+class MyApp extends StatelessWidget {
+  MyApp({super.key});
+
+  Color corAzul = Color.fromARGB(255, 9, 102, 136);
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'AccessCity',
-      theme: ThemeData(
-        primarySwatch: Colors.lightBlue,
-      ),
-      home: Scaffold(
-        appBar: AppBar(
-          title: Text("AccessCity"
-        ),
-      ),
-      body: SingleChildScrollView( 
-        child: Column(
-          children: [SizedBox(
-            width: 360,
-            height: 560,
-            child:
-            FlutterMap(
-              options: MapOptions(
-                center: LatLng(-22.560992, -47.423818),
-                zoom: 8.0, 
-              ),
-              layers: [
-                TileLayerOptions(
-                  urlTemplate: "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
-                  subdomains: ['a', 'b', 'c'],
-                ),
-              ],
-            ),
-          ),
-        ]),
-      ),
-    )
+        debugShowCheckedModeBanner: false,
+        title: 'AccessCity',
+        theme: ThemeData(
+          primarySwatch: Colors.blue,
+        ), 
+        routes: {
+          '/':(context) => Login(),
+          '/onibus':(context) => Onibus(),
+          'lugar':(context) => Lugar(),
+          '/perfil': (context) => Perfil(),
+          '/configuracoes': (context) => Configuracao(),
+          '/documentos': (context) => Documentos(),
+        },
+        
     );
   }
 }
