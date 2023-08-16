@@ -1,12 +1,11 @@
 import path from "path";
 import express, { Request, Response, request } from 'express';
 import { differenceInYears } from 'date-fns';
-//import { v4 as uuidv4 } from 'uuid';
+import jwt from 'jsonwebtoken';
 import bodyParser from "body-parser";
 const bcrypt = require('bcrypt');
 const mysql = require('mysql');
 const session = require('cookie-session');
-const jwt = require('jsonwebtoken');
 const app = express();
 const port = 3000;
 const numSalt = 12;
@@ -126,6 +125,11 @@ app.get('/contato', (req: Request, res: Response) => {
     res.render("contato.ejs");
 });
 
+app.get('mudarsenha', (req: Request, res: Response ) =>{
+    //Veja se o usuário está logado, caso contrário envie-no de volta à página inicial com uma mensagem de erro
+
+    res.render("mudarsenha.ejs");
+});
 
 app.post('/cadastro', async (req: Request, res: Response) =>{
     const user = req.body.user;
@@ -186,28 +190,38 @@ app.post('/cadastro', async (req: Request, res: Response) =>{
     const password = req.body.password;
     let usuario = new Usuario(user, date, email, tel, deficiencia, password);
     let resultado = await usuario.cadastrar();
+    // validar cookie de sessão
     if (resultado)
     {
         res.render('index.ejs');
     }    
 });
 
+
+
+//TODO: mudar a senha
+
+/*
+    Para mudar a senha é necessário realizar uma série de etapas:
+    1- Quando se usa o recurso de alterar a senha, é necessário que o usuário esteja logado.
+    2- Depois é eviado um link para alterar a senha pelo e-mail do usuário. Nisso é util o sistema usado para verificar se o usuário está logado, pois assim é possivel armazenar seu E-mail
+    3- O e-mail terá um link que levará o usuário para uma ágina de nosso domínio, onde ele há de escrever sua nova senha.
+    4- Alterar no banco de dados a nova senha
+*/
+
+
+
 app.post('/login', async (req: Request, res: Response) =>{
     const email = req.body.email;
     const password = req.body.password;
     let usuario = new Usuario("", "", email, "", [], password);
     let resultado = await usuario.login();
+    console.log(resultado);
 
-    if(resultado){/*
-        const foo = {id: uuidv4(), name: user, role: 'user'};
-        const token = jwt.sign(foo, 'secret');
-        res.cookie(
-            'token', token, {
-                httpOnly: true,
-                secure: true,
-                sameSite: 'strict'
-            });*/
-            res.render('index.ejs');
+    if(resultado){
+        const user = { email: email, senha: password }
+        //const token = jwt.sign(user, )
+        res.render('index.ejs');
         console.log(`Login realizado com sucesso!!`);
     }
     else{
