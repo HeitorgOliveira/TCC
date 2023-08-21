@@ -8,12 +8,14 @@ import mysql.connector
 import smtplib
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
+UPLOAD_FOLDER = "usuarios"
 
 app = Flask(__name__)
 
 #Em caso de falsa, a sessão será encerrada ao fechar o navegador
 app.config["SESSION_PERMANENT"] = True
 app.config["SESSION_TYPE"] = 'filesystem'
+app.config["UPLOAD_FOLDER"] = UPLOAD_FOLDER
 Session(app)
 
 def login_necessario(f):
@@ -57,16 +59,18 @@ class Usuario:
                 queue = "INSERT INTO AC_Usuario (usuario, datanasc, email, celular, deficiencias, senha) VALUES (%s, %s, %s, %s, %s, %s)"
                 values = (self.nome, self.datanasc, self.email, self.celular, ", ".join(self.deficiencia), hash)
                 cursor.execute(queue, values)
+                session['user_id'] = self.nome
                 con.commit()
                 cursor.close()
                 con.close()
                 print("1 dado modificado")
-                return True
+                return redirect('/')
             else:
                 cursor.close()
                 con.close()
                 print("Email já cadastrado")
-                return False
+                flash("Email já cadastrado", "erro")
+                return render_template("index.html")
         except Exception as err:
             print(f"ERRO: {err}")
             return False
@@ -227,6 +231,14 @@ def email():
         except Exception as err:
             print(f"Erro: {err}")
             return redirect('/')
+        
+@app.route('/alteranome', methods = ["POST"])
+@login_necessario
+def alteranome():
+    if request.method == "POST":
+        nome = request.form.get("NOME")
+        if nome != "" or nome != session['user_id']:
+            print(nome)
 
 if __name__ == '__main__':
     app.run(port=3000)
