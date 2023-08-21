@@ -219,5 +219,3 @@ app.post('/login', async (req: Request, res: Response) =>{
 app.listen(port, ()=>{
     console.log(`Aqui: http://localhost:${port}`);
 });
-
-

@@ -1,0 +1,284 @@
+<html lang="pt-br">
+
+<head>
+  <meta charset="UTF=8">
+  <meta hhtp-equiv="X-UA-Compatible" content="IE=edge">
+  <link rel="shortcut icon" href="imagens/Logo3.png" type="image/x-icon">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AccessCity</title>
+
+  <!-- CSS only -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/css/bootstrap.min.css" rel="stylesheet"
+    integrity="sha384-Zenh87qX5JnK2Jl0vWa8Ck2rdkQ2Bzep5IDxbcnCeuOxjzrPF/et3URy9Bv1WTRi" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.9.1/font/bootstrap-icons.css">
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+  <style class="text/css">
+    body {
+      background-color: #e6dfd2;
+    }
+
+    .container {
+      padding: 0;
+    }
+
+    .recheio{
+      padding-top: 10ch;
+    }
+  </style>
+</head>
+
+<body>
+  <!--Começo NavBar-->
+  <nav class="navbar navbar-expand-lg navbar-dark" style="background-color: rgb(102, 155, 188);">
+    <div class="container-fluid">
+      <a class="navbar-brand" href="index.html"><img src="{{ 'imagens/logo3.png' | url_for_static }}" height="40px" width="40px"></a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent"
+        aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarSupportedContent">
+        <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+          <li class="nav-item">
+            <a class="nav-link" aria-current="page" href="/"><span lang="en-us">Home</span></a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link active" href="/sobre">Sobre nós</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="/contato">Contato</a>
+          </li>
+          {% if  session['user_id'] %}
+                <li class="nav-item">
+                    <a class="nav-link" href="/documentos">Documentos</a>
+                </li>
+                </ul>
+                  <form class="d-flex ml-auto" style="margin-left: auto;" role="search" method="post" action="/sair">
+                      <button type="submit" class="btn btn-light">Sair</button>
+                  </form>
+                {% else %}
+                <li class="nav-item">
+                    <a class="nav-link disabled" href="/documentos">Documentos</a>
+                </li>
+              </ul>
+                    <form class="d-flex ml-auto" role="search">
+                        <a class="btn btn-light" role="button" href="/tela">Log In</a>
+                    </form>
+                {% endif %}
+      </div>
+    </div>
+  </nav>
+  <!--Final NavBar-->
+
+  <!--Container da História-->
+  <h1 class="display-2 text-center">Sobre nós</h1>
+
+  <!--Novo Container História-->
+  <div class="container-fluid pt-3">
+    <div class="row d-flex flex-fill justify-content-evenly">
+      <div class="col-md-4 recheio">
+        <div class="row containerCard justify-content-center align-items-center align-self-center">
+          <div class="col-md-12">
+            <h2 class="display-4 text-center">O que é <span lang="en-us">AccessCity</span>?</h2>
+          </div>
+          <div class="col-md-9">
+            <p class="pt-4 text-center"><span lang="en-us">AccessCity</span> é um aplicativo <span
+                lang="en-us">mobile</span> que tem
+              como objetivo tornar as cidades brasileiras mais acessíveis. A aplicação auxilia no uso de transporte
+              público,
+              utiliza filtros para avaliação de estabelecimentos baseados em sua acessibilidade (restaurantes, parques,
+              escolas, etc) e possui scanner e atalhos para armazenar uma cópia do passe livre e outros documentos
+              importantes
+              como laudos.</p>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-5 align-items-start">
+        <img src="{{ 'imagens/freepik.png' | url_for_static }}" height="500px">
+      </div>
+    </div>
+
+    <div class="row d-flex flex-fill justify-content-evenly">
+      <div class="col-md-4 align-items-start">
+        <img src="{{ 'imagens/freepik2.png' | url_for_static }}" height="400px">
+      </div>
+      <div class="col-md-4 recheio">
+        <div class="row containerCard justify-content-center align-items-center align-self-center">
+          <div class="col-md-12">
+            <h2 class="display-4 text-center">De onde isso veio?</h2>
+          </div>
+          <div class="col-md-9">
+            <p class="pt-4 text-center"><span lang="en-us">AccessCity</span> é um aplicativo <span
+                lang="en-us">mobile</span> que tem
+              como objetivo tornar as cidades brasileiras mais acessíveis. A aplicação auxilia no uso de transporte
+              público,
+              utiliza filtros para avaliação de estabelecimentos baseados em sua acessibilidade (restaurantes, parques,
+              escolas, etc) e possui scanner e atalhos para armazenar uma cópia do passe livre e outros documentos
+              importantes
+              como laudos.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!--Fim conteiner historia-->
+
+  <h2 class="display-3 text-center pt-5">Funcionalidades</h2>
+
+  <!--Container Funcionalidades-->
+  <div class="container-fluid d-flex pt-4">
+    <div class="row cont justify-content-evenly flex-fill">
+      <div class="car">
+        <div class="conteudo">
+          <h2>ônibus</h2>
+          <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Labore reprehenderit repudiandae quod numquam esse
+            temporibus soluta voluptate sint.
+            consectetur.</p>
+          <a href="">Read More</a>
+        </div>
+        <img src="{{ 'imagens/celular.png' | url_for_static }}">
+      </div>
+      <div class="car">
+        <div class="conteudo">
+          <h2>Avaliação</h2>
+          <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Labore reprehenderit repudiandae quod numquam esse
+            temporibus soluta voluptate sint.
+            consectetur.</p>
+          <a href="">Read More</a>
+        </div>
+        <img src="{{ 'imagens/celular.png' | url_for_static }}">
+      </div>
+      <div class="car">
+        <div class="conteudo">
+          <h2>Documentos</h2>
+          <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Labore reprehenderit repudiandae quod numquam esse
+            temporibus soluta voluptate sint.
+            consectetur.</p>
+          <a href="">Read More</a>
+        </div>
+        <img src="{{ 'imagens/celular.png' | url_for_static }}">
+      </div>
+    </div>
+  </div>
+  <!--Container Funcionalidades-->
+  
+  <!--Container da Equipe -->
+  <div class="container-fluid">
+    <div class="row">
+      <h1 class="display-1 text-center">Nossa Equipe</h1>
+    </div>
+      <div class="row justify-content-center mb-2">
+      <div class="box">
+        <!--1º Card - Lua -->
+        <div class="col-md-3">
+          <div class="card">
+              <div class="imgBx">
+                  <img src="{{ 'imagens/equipe/yo.jfif' | url_for_static }}">
+              </div>
+              <div class="content">
+                  <div class="details">
+                      <h2>Luanna Sachinelli Paggiaro<br><span>Project Manager</span></h2>
+                  </div>
+              </div>
+          </div>
+        </div>
+        <!--2º Card - Nat -->
+        <div class="col-md-3">
+          <div class="card">
+              <div class="imgBx">
+                  <img src="{{ 'imagens/equipe/nat.png' | url_for_static }}">
+              </div>
+              <div class="content">
+                  <div class="details">
+                      <h2>Natália Carvalho<br><span>Programadora e PCD</span></h2>
+                  </div>
+              </div>
+          </div>
+        </div>
+        <!--3º Card - Heitor -->
+        <div class="col-md-3">
+          <div class="card">
+              <div class="imgBx">
+                  <img src="{{ 'imagens/equipe/heitor.jpg' | url_for_static }}">
+              </div>
+              <div class="content">
+                  <div class="details">
+                      <h2>Heitor Gomes de Oliveira<br><span>Programador</span></h2>
+                  </div>
+              </div>
+          </div>
+        </div>
+        <!--4º Card - Cat -->
+        <div class="col-md-3">
+          <div class="card">
+              <div class="imgBx">
+                  <img src="{{ 'imagens/equipe/cat.png' | url_for_static }}">
+              </div>
+              <div class="content">
+                  <div class="details">
+                      <h2>Catarina Fagotti Bonifácio<br><span>Programadora</span></h2>
+                  </div>
+              </div>
+          </div>
+        </div>
+        <!--fim cards -->
+      </div>
+    </div>
+  </div>
+
+  <!--Começo Novo Footer-->
+  <footer>
+    <div class="containerF">
+        <div class="sec aboutus">
+            <h2>Sobre nós</h2>
+            <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Ipsum velit neque ut praesentium, earum nemo doloremque, itaque
+            sed numquam deserunt, totam iusto enim eum quis libero quibusdam quae quasi? Libero.</p>
+            <ul class="sci">
+                <li><a href="#"><i class="bi bi-facebook"></i></a></li>
+                <li><a href="#"><i class="bi bi-twitter"></i></a></li>
+                <li><a href="#"><i class="bi bi-instagram"></i></a></li>
+                <li><a href="#"><i class="bi bi-youtube"></i></a></li>
+            </ul>
+        </div>
+        <div class="sec quicklinks">
+            <h2>Links Rápidos</h2>
+            <ul>
+                <li><a href="#">About</a></li>
+                <li><a href="#">FAQ</a></li>
+                <li><a href="#">Privacy Policy</a></li>
+                <li><a href="#">Help</a></li>
+                <li><a href="#">Terms & Conditions</a></li>
+                <li><a href="#">Contact</a></li>
+            </ul>
+        </div>
+        <div class="sec contact">
+            <h2>Contato</h2>
+            <ul class="info">
+                <li>
+                    <span><i class="bi bi-geo-alt-fill"></i></span>
+                    <span>647 Linda Rua<br>
+                    Cordeirópolis, CEP 130888-34,<br>BR</span>
+                </li>
+                <li>
+                    <span><i class="bi bi-telephone-fill"></i></span>
+                    <p><a href="tel: 123456789">(19) 99999-9999</a><br>
+                    <a href="tel: 123456789">(19) 99999-9999</a></p>
+                </li>
+                <li>
+                    <span><i class="bi bi-envelope-fill"></i></span>
+                    <p><a href="mailto: google@gmail.com">accesscity@gmail.com</a></p>
+                </li>
+            </ul>
+        </div>
+    </div>
+</footer>
+<div class="copyrightText">
+    <p>Copyright © 2023 AccessCity. All Rights Reserved.</p>
+</div>
+  <!--Fim Footer-->
+</body>
+
+<!--Javascript-->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/js/bootstrap.bundle.min.js"
+  integrity="sha384-OERcA2EqjJCMA+/3y+gxIOqMEjwtxJY7qPCqsdltbNJuaOe923+mo//f6V8Qbsw3" crossorigin="anonymous"></script>
+
+</html>
