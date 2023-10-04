@@ -32,11 +32,13 @@ def url_for_static(filename):
     return url_for('static', filename=filename)
 
 class Usuario:
-    def __init__(self, nome, datanasc, email, celular, deficiencia, senha):
+    def __init__(self, cpf, nome, usuario, datanasc, email, celular, deficiencia, senha):
+        self.cpf = cpf
         self.nome = nome
-        self.datanasc = datanasc
+        self.usuario = usuario
         self.email = email
         self.celular = celular
+        self.datanasc = datanasc
         self.deficiencia = deficiencia
         self.senha = senha
 
@@ -56,8 +58,8 @@ class Usuario:
 
             if len(result) == 0:
                 hash = bcrypt.hashpw(self.senha.encode('utf-8'), bcrypt.gensalt())
-                queue = "INSERT INTO AC_Usuario (usuario, datanasc, email, celular, deficiencias, senha) VALUES (%s, %s, %s, %s, %s, %s)"
-                values = (self.nome, self.datanasc, self.email, self.celular, ", ".join(self.deficiencia), hash)
+                queue = "INSERT INTO AC_Usuario (cpf, nomecompleto, usuario, email, celular, datanascimento, senha) VALUES (%s, %s, %s, %s, %s, %s, %s)"
+                values = (self.cpf, self.nome, self.usuario, self.email, self.celular, self.datanasc, hash)
                 cursor.execute(queue, values)
                 session['user_id'] = self.nome
                 con.commit()
@@ -95,7 +97,9 @@ class Usuario:
 
                 if match:
                     print(f"Result inteiro: {result[0]}\nResult[0][1]: {result[0][1]}")
-                    session['user_id'] = result[0][1]
+                    print(result[0])
+                    session['cpf'] = result[0][1]
+                    session
                     cursor.close()
                     con.close()
                     return render_template("index.html")
@@ -106,6 +110,7 @@ class Usuario:
         except Exception as err:
             print(f"ERRO: {err}")
             return False
+
 
 @app.route('/')
 def index():
@@ -136,8 +141,13 @@ def perfil():
 @app.route('/cadastro', methods=['GET', 'POST'])
 def cadastro():
     if request.method == 'POST':
+        nomecompleto = request.form.get('nomecompleto')
         user = request.form.get('user')
         date = request.form.get('date')
+        cpf = request.form.get('cpf')
+        print(cpf)
+        if len(cpf) != 11:
+            return render_template('index.html')
         try:
             datetime.strptime(date, '%Y-%m-%d')
             idade = datetime.now().year - int(date.split('-')[0])
@@ -171,12 +181,13 @@ def cadastro():
             deficiencia.append('outro')
 
         password = request.form.get('password')
-        usuario = Usuario(user, date, email, tel, deficiencia, password)
+        usuario = Usuario(cpf, nomecompleto, user, email, tel, date, deficiencia, password)
         resultado = usuario.cadastrar()
 
         if resultado:
             return render_template('index.html')
-        
+        else:
+            return "ERRO!! HAHA VOCÊ NÃO FOI RETORNADO HAHAHAHAHAHAHAHAHA"
     else:
         return render_template("cadastro.html")
 
@@ -185,7 +196,7 @@ def login():
     if request.method == "POST":
         email = request.form.get('email')
         password = request.form.get('password')
-        usuario = Usuario("", "", email, "", [], password)
+        usuario = Usuario("", "", "", "", email, "", [], password)
         resultado = usuario.login()
 
         if resultado:
@@ -202,6 +213,18 @@ def sair():
     if request.method == "POST":
         session.clear()
         return redirect("/")
+    
+'''@app.route('/addfoto', methods = ["POST"])
+def addfoto():
+    file = request.files['foto']
+    if file.filename == "":
+        flash('Nenhum arquivo selecionado')
+        return redirect('/')
+
+    if file:
+        foto  = base64.b64encode(file.read())
+
+        cpf = session.get('cpf')'''
 
 @app.route('/email', methods = ["GET", "POST"])
 def email():
