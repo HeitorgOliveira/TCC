@@ -4,8 +4,6 @@ from datetime import datetime
 from functools import wraps
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
-import json
-import requests
 import re
 import bcrypt
 import mysql.connector
