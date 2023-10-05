@@ -1,19 +1,21 @@
-from flask import Flask, request, render_template, url_for, session, flash, redirect
+from flask import Flask, request, render_template, url_for, session, flash, redirect, jsonify
 from flask_session import Session
 from datetime import datetime
 from functools import wraps
+from email.mime.text import MIMEText
+from email.mime.multipart import MIMEMultipart
+import json
+import requests
 import re
 import bcrypt
 import mysql.connector
 import smtplib
-from email.mime.text import MIMEText
-from email.mime.multipart import MIMEMultipart
+import base64
 UPLOAD_FOLDER = "usuarios"
 
 app = Flask(__name__)
 
-#Em caso de falsa, a sessão será encerrada ao fechar o navegador
-app.config["SESSION_PERMANENT"] = True
+app.config["SESSION_PERMANENT"] = True      #Em caso de falsa, a sessão será encerrada ao fechar o navegador
 app.config["SESSION_TYPE"] = 'filesystem'
 app.config["UPLOAD_FOLDER"] = UPLOAD_FOLDER
 Session(app)
@@ -21,7 +23,7 @@ Session(app)
 def login_necessario(f):
     @wraps(f)
     def decorated_function(*args, **kwargs):
-        if 'user_id' not in session:
+        if 'cpf' not in session:
             flash("Você não tem acesso a esta página", "error")
             return redirect('/')
         return f(*args, **kwargs)
@@ -42,6 +44,11 @@ class Usuario:
         self.deficiencia = deficiencia
         self.senha = senha
 
+    def get_todos_dados(self):
+        data = {'cpf' : self.cpf, 'nome_completo': self.nome, 'nome_usuario': self.usuario, 'email': self.email, 'celular': self.celular, 'data_nascimento': self.datanasc}
+        return jsonify(data)
+
+
     def cadastrar(self):
         try:
             con = mysql.connector.connect(
@@ -61,18 +68,18 @@ class Usuario:
                 queue = "INSERT INTO AC_Usuario (cpf, nomecompleto, usuario, email, celular, datanascimento, senha) VALUES (%s, %s, %s, %s, %s, %s, %s)"
                 values = (self.cpf, self.nome, self.usuario, self.email, self.celular, self.datanasc, hash)
                 cursor.execute(queue, values)
-                session['user_id'] = self.nome
+                session['cpf'] = self.cpf
                 con.commit()
                 cursor.close()
                 con.close()
                 print("1 dado modificado")
-                return redirect('/')
+                return True
             else:
                 cursor.close()
                 con.close()
                 print("Email já cadastrado")
                 flash("Email já cadastrado", "erro")
-                return render_template("index.html")
+                return False
         except Exception as err:
             print(f"ERRO: {err}")
             return False
@@ -92,25 +99,63 @@ class Usuario:
             result = cursor.fetchall()
 
             if len(result) > 0:
-                dbhash = result[0][6].encode('utf-8')
+                dbhash = result[0][-1].encode('utf-8')
                 match = bcrypt.checkpw(self.senha.encode('utf-8'), dbhash)
 
                 if match:
-                    print(f"Result inteiro: {result[0]}\nResult[0][1]: {result[0][1]}")
-                    print(result[0])
-                    session['cpf'] = result[0][1]
-                    session
+                    queue = "SELECT * FROM AC_Usuario WHERE cpf = %s"
+                    values = (result[0][0],)
+                    cursor.execute(queue, values)
+                    result = cursor.fetchone()
+                    self.cpf = result[0]
+                    self.nome = result[1]
+                    self.usuario = result[2]
+                    self.email = result[3]
+                    self.celular = result[4]
+                    self.datanasc = result[5]
+                    session['cpf'] = self.cpf
+                    con.commit()
                     cursor.close()
                     con.close()
-                    return render_template("index.html")
+                    return True
+                else:
+                    print("Login falhou - Senha não bate")
+                    return False
             cursor.close()
             con.close()
-            print("Login falhou")
+            print("Login falhou - E-mail não encontrado")
             return False
         except Exception as err:
             print(f"ERRO: {err}")
             return False
 
+    def addfoto(self, foto):
+        try:
+            con = mysql.connector.connect(
+                host="143.106.241.3",
+                user="cl201174",
+                password="essaehumasenha!",
+                database="cl201174"
+            )
+            cursor = con.cursor()
+            queue = "SELECT * FROM AC_Usuario WHERE cpf = %s"
+            values = (self.cpf,)
+            cursor.execute(queue, values)
+            result = cursor.fetchall()
+            if len(result) > 0:
+                queue = "UPDATE AC_Usuario SET fotoperfil = %s WHERE cpf = %s"
+                values = (foto, self.cpf)
+                cursor.execute(queue, values)
+                con.commit()
+                cursor.close()
+                con.close()
+                return True
+            else:
+                print("Erro na adição de foto de perfil")
+                return False
+        except Exception as err:
+            print(f"ERRO: {err}")
+            return False
 
 @app.route('/')
 def index():
@@ -145,9 +190,12 @@ def cadastro():
         user = request.form.get('user')
         date = request.form.get('date')
         cpf = request.form.get('cpf')
-        print(cpf)
+
+        #Validar o CPF:
         if len(cpf) != 11:
-            return render_template('index.html')
+            return redirect('/')
+        
+        #Validar a idade:
         try:
             datetime.strptime(date, '%Y-%m-%d')
             idade = datetime.now().year - int(date.split('-')[0])
@@ -156,54 +204,48 @@ def cadastro():
         except (ValueError, TypeError):
             print("Idade inválida")
             flash("Erro no cadastro - Idade inválida.", "Error")
-            return render_template('index.html')
+            return redirect('/')
 
+        #Validar o email:
         email = request.form.get('email')
         if not re.match(r"[^@]+@[^@]+\.[^@]+", email):
             print("E-mail inválido")
             flash("Erro no cadastro - Email inválido.", "Error")
-            return render_template('index.html')
+            return redirect('/')
 
+        #Validar o telefone:
         tel = request.form.get('tel')
         if not re.match(r"\d{2} \d{5}-\d{4}", tel):
             print("Telefone inválido")
             flash("Erro no cadastro - Telefone inválido.", "Error")
-            return render_template('index.html')
-
-        deficiencia = []
-        if request.form.get('motora') == 'on':
-            deficiencia.append('motora')
-        if request.form.get('visual') == 'on':
-            deficiencia.append('visual')
-        if request.form.get('auditiva') == 'on':
-            deficiencia.append('auditiva')
-        if request.form.get('outros') == 'on':
-            deficiencia.append('outro')
+            return redirect('/')
 
         password = request.form.get('password')
-        usuario = Usuario(cpf, nomecompleto, user, email, tel, date, deficiencia, password)
+        #cpf, nome, usuario, datanasc, email, celular, deficiencia, senha
+        usuario = Usuario(cpf, nomecompleto, user, date, email, tel, [], password)
         resultado = usuario.cadastrar()
 
         if resultado:
-            return render_template('index.html')
+            return redirect('/')
         else:
-            return "ERRO!! HAHA VOCÊ NÃO FOI RETORNADO HAHAHAHAHAHAHAHAHA"
+            return redirect('/')
     else:
-        return render_template("cadastro.html")
+        return redirect('/')
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == "POST":
         email = request.form.get('email')
         password = request.form.get('password')
+        #cpf, nome, usuario, datanasc, email, celular, deficiencia, senha
         usuario = Usuario("", "", "", "", email, "", [], password)
         resultado = usuario.login()
 
         if resultado:
-            return render_template('index.html')
+            return redirect('/')
         else:
             flash("Erro no Login.", "Error")
-            return render_template('login.html')
+            return redirect('/login')
     
     else:
         return render_template('login.html')
@@ -214,17 +256,26 @@ def sair():
         session.clear()
         return redirect("/")
     
-'''@app.route('/addfoto', methods = ["POST"])
+@app.route('/addfoto', methods = ["POST"])
 def addfoto():
-    file = request.files['foto']
-    if file.filename == "":
-        flash('Nenhum arquivo selecionado')
-        return redirect('/')
+    if request.method == "POST":
+        file = request.files['foto']
+        if file.filename == "":
+            flash('Nenhum arquivo selecionado')
+            return redirect('/')
 
-    if file:
-        foto  = base64.b64encode(file.read())
+        if file:
+            foto  = file.read()
+            cpf = session.get('cpf')
+            usuario = Usuario(cpf, "", "", "", "", "", [], "")
+            if usuario.addfoto(foto):
+                print("Sucesso ao trocar a foto")
+                return redirect('/')
+            else:
+                print("Erro ao alterar foto")
+                return redirect('/')
 
-        cpf = session.get('cpf')'''
+
 
 @app.route('/email', methods = ["GET", "POST"])
 def email():
@@ -234,7 +285,7 @@ def email():
         receiver = 'gkfvrcntzfwmlcfhpb@cwmxc.com'
 
         assunto = "Recuperação de senha"
-        mensagem = 'Olá, vimos que você selecionou a opção de "trocar senha", para continuar <a href="ENDEREÇO DA TROCA DE EMIAL">acesse aqui</a>.'
+        mensagem = 'Olá, vimos que você selecionou a opção de trocar senha, para continuar <a href="ENDEREÇO DA TROCA DE EMAIL">acesse aqui</a>.'
 
         msg = MIMEMultipart()
         msg['De'] = sender
@@ -263,5 +314,62 @@ def alteranome():
         if nome != "" or nome != session['user_id']:
             print(nome)
 
+@app.route('/mobile/login', methods = ["POST"])
+def login_mobile():
+    if request.method == "POST":
+        data_json = request.get_json()
+
+        email = data_json.get('email')
+        senha = data_json.get('senha')
+        usuario = Usuario("", "", "", "", email, "", [], senha)
+        resultado = usuario.login()
+        if resultado:
+            return usuario.get_todos_dados() 
+
+@app.route('/mobile/registro', methods = ["POST"])
+def registro_mobile():
+    if request.method == "POST":
+        data_json = request.get_json()
+
+        cpf = data_json.get('cpf')
+        nome_completo = data_json.get('nome_completo')
+        username = data_json.get('username')
+        email = data_json.get('email')
+        celular = data_json.get('celular')
+        data_nascimento = data_json.get('data_nascimento')
+        senha = data_json.get('senha')
+
+        #Validação do CPF:
+        if len(cpf) != 11:
+            return 'Erro - CPF invalido (cpf deve ter 11 digitos)', 500
+        
+        #Validação da data de nascimento:
+        try:
+            datetime.strptime(data_nascimento, '%Y-%m-%d')
+            idade = datetime.now().year - int(data_nascimento.split('-')[0])
+            if idade < 18 or int(data_nascimento.split('-')[0] )< 1907:
+                raise ValueError
+        except (ValueError, TypeError):
+            print("Idade inválida")
+            return 'Erro - Idade invalida', 500
+        
+        #validaçaõ do email
+        if not re.match(r"[^@]+@[^@]+\.[^@]+", email):
+            print("E-mail inválido - formato inválido")
+            return 'Erro - Email inválido', 500
+        
+        #Validação do telefone
+        if not re.match(r"\d{2} \d{5}-\d{4}", celular):
+            print("Celular inválido - Número inválido")
+            return 'Erro - Celular inválido', 500
+        
+        usuario = Usuario(cpf, nome_completo, username, data_nascimento, email, celular, [], senha)
+        resultado = usuario.cadastrar()
+        if resultado:
+            return usuario.get_todos_dados()
+        else:
+            return 'Email já cadastrado', 500
+
+        
 if __name__ == '__main__':
     app.run(port=3000)
