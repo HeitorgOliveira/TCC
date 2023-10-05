@@ -8,7 +8,6 @@ import re
 import bcrypt
 import mysql.connector
 import smtplib
-import base64
 UPLOAD_FOLDER = "usuarios"
 
 app = Flask(__name__)
