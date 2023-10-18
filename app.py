@@ -42,6 +42,7 @@ class Usuario:
         self.senha = senha
 
     def get_todos_dados(self):
+        #Retorna Nome, Nome de usuário, Email, celular e Data de nascimento do usuário em formato JSON
         data = {'cpf' : self.cpf, 'nome_completo': self.nome, 'nome_usuario': self.usuario, 'email': self.email, 'celular': self.celular, 'data_nascimento': self.datanasc}
         return jsonify(data)
 
@@ -227,7 +228,7 @@ def cadastro():
         else:
             return redirect('/')
     else:
-        return redirect('/')
+        return render_template('cadastro.html')
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
@@ -367,6 +368,87 @@ def registro_mobile():
         else:
             return 'Email já cadastrado', 500
 
-        
+@app.route('/avaliacao', methods = ['POST'])
+def avaliacao():
+    if request.method == "POST":
+        json_data = request.get_json()
+        comentario = json_data.get('comentario')
+        pontuacao = json_data.get('avaliacao')
+        cpf_usuario = json_data.get('cpf')
+        id_lugar = json_data.get('lugar')
+        try:
+            con = mysql.connector.connect(
+                host="143.106.241.3",
+                user="cl201174",
+                password="essaehumasenha!",
+                database="cl201174"
+            )
+
+            cursor = con.cursor()
+            queue = "SELECT * FROM AC_Usuario WHERE CPF = %s"
+            values = (cpf_usuario,)
+            cursor.execute(queue, values)
+            result = cursor.fetchall()
+
+            if len(result) == 1:
+                queue = "INSERT INTO AC_Avaliacoes (id, cpf_usuario, id_lugar, comentario, pontuacao) VALUES (NULL, %s, %s, %s, %s)"
+                id_lugar = int(id_lugar)
+                pontuacao = int(pontuacao)
+                values = (cpf_usuario, id_lugar, comentario, pontuacao,)
+                cursor.execute(queue, values)
+                con.commit()
+                return "Avaliação enviada com sucesso"
+            return 'ERRO - CPF não encontrado', 500
+        except Exception as e:
+            return f'ERRO - {e}', 500
+
+        finally:
+            cursor.close()
+            con.close()
+    return 'ERRO', 500
+
+@app.route('/usuario_deficiencia', methods = ['POST'])
+def usuario_deficiencia():
+    if request.method == 'POST':
+        try:
+            con = mysql.connector.connect(
+                    host="143.106.241.3",
+                    user="cl201174",
+                    password="essaehumasenha!",
+                    database="cl201174"
+                )
+            
+            json_data = request.get_json()
+            cpf_usuario = json_data.get('cpf_usuario')
+            nome_deficiencia = json_data.get('nome_deficiencia')
+            cursor = con.cursor()
+            queue = "SELECT * FROM AC_Usuario WHERE CPF = %s"
+            values = (cpf_usuario,)
+            cursor.execute(queue, values)
+            nuser = cursor.fetchall()
+
+            queue = "SELECT codigo FROM AC_Deficiencias WHERE nome = %s"
+            values = (nome_deficiencia,)
+            cursor.execute(queue, values)
+            ndeficiencia = cursor.fetchall()
+
+            if len(ndeficiencia) == 0:
+                return "Deficiencia não consta no banco de dados", 500
+
+            if len(nuser) and len(ndeficiencia) == 1:
+                codigo_deficiencia = ndeficiencia[0][0]
+                queue = "INSERT INTO AC_Usuario_Deficiencias (id, codigo, cpf) VALUES (NULL, %s, %s)"
+                values = (codigo_deficiencia, cpf_usuario)
+                cursor.execute(queue, values)
+                con.commit()
+                return "Associação feita com sucesso"
+            
+        except Exception as e:
+            return f"ERRO - {e}", 500
+        finally:
+            cursor.close()
+            con.close()
+    return
+
 if __name__ == '__main__':
     app.run(port=3000)
