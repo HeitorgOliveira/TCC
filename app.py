@@ -367,8 +367,40 @@ def registro_mobile():
             return usuario.get_todos_dados()
         else:
             return 'Email já cadastrado', 500
+@app.route('/getavaliacao', methods = ['GET'])
+def get_avaliacao():
+    if request.method == "GET":
+        json_data = request.get_json()
+        cpf_usuario = json_data.get('cpf_usuario')
+        try:
+            con = mysql.connector.connect(
+                host='143.106.241.3',
+                user="cl201174",
+                password="essaehumasenha!",
+                database="cl201174"
+            )
+            cursor = con.cursor()
+            queue = "SELECT * FROM AC_Avaliacoes WHERE cpf_usuario = %s"
+            values = (cpf_usuario,)
+            cursor.execute(queue, values)
+            result = cursor.fetchall()
 
-@app.route('/avaliacao', methods = ['POST'])
+            if len(result) > 0:
+                lista = []
+                for i in result:
+                    lista.append( {"id": i[0], "cpf_usuario": i[1], "id_lugar": i[2], "comentario": i[3], "pontacao": i[4]})
+                return(lista)
+                #COLOCAR O RETORNO
+            else:
+                return f"O usuário de cpf {cpf_usuario} ainda não fez nenhum comentário", 500  
+        except Exception as e:
+            return f"ERRO {e}", 500
+        finally:
+            cursor.close()
+            con.close()
+    return 403
+
+@app.route('/cadastraavaliacao', methods = ['POST'])
 def avaliacao():
     if request.method == "POST":
         json_data = request.get_json()
