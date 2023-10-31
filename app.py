@@ -8,6 +8,7 @@ import re
 import bcrypt
 import mysql.connector
 import smtplib
+
 UPLOAD_FOLDER = "usuarios"
 
 app = Flask(__name__)
@@ -338,7 +339,7 @@ def registro_mobile():
         senha = data_json.get('senha')
 
         #Validação do CPF:
-        if len(cpf) != 11:
+        if not re.match(r"^\d{3}\.\d{3}\.\d{3}-\d{2}$", cpf):
             return 'Erro - CPF invalido (cpf deve ter 11 digitos)', 500
         
         #Validação da data de nascimento:
@@ -361,17 +362,18 @@ def registro_mobile():
             print("Celular inválido - Número inválido")
             return 'Erro - Celular inválido', 500
         
-        usuario = Usuario(cpf, nome_completo, username, data_nascimento, email, celular, [], senha)
+        usuario = Usuario(re.sub(r"\D", "", cpf), nome_completo, username, data_nascimento, email, celular, [], senha)
         resultado = usuario.cadastrar()
         if resultado:
             return usuario.get_todos_dados()
         else:
             return 'Email já cadastrado', 500
+            
 @app.route('/getavaliacao', methods = ['GET'])
 def get_avaliacao():
     if request.method == "GET":
         json_data = request.get_json()
-        cpf_usuario = json_data.get('cpf_usuario')
+        id_lugar = json_data.get('id_lugar')
         try:
             con = mysql.connector.connect(
                 host='143.106.241.3',
@@ -380,8 +382,8 @@ def get_avaliacao():
                 database="cl201174"
             )
             cursor = con.cursor()
-            queue = "SELECT * FROM AC_Avaliacoes WHERE cpf_usuario = %s"
-            values = (cpf_usuario,)
+            queue = "SELECT * FROM AC_Avaliacoes WHERE id_lugar = %s"
+            values = (id_lugar,)
             cursor.execute(queue, values)
             result = cursor.fetchall()
 
@@ -392,7 +394,7 @@ def get_avaliacao():
                 return(lista)
                 #COLOCAR O RETORNO
             else:
-                return f"O usuário de cpf {cpf_usuario} ainda não fez nenhum comentário", 500  
+                return f"O usuário de cpf {id_lugar} ainda não fez nenhum comentário", 500  
         except Exception as e:
             return f"ERRO {e}", 500
         finally:
@@ -405,9 +407,9 @@ def avaliacao():
     if request.method == "POST":
         json_data = request.get_json()
         comentario = json_data.get('comentario')
-        pontuacao = json_data.get('avaliacao')
+        pontuacao = json_data.get('pontuacao')
         cpf_usuario = json_data.get('cpf')
-        id_lugar = json_data.get('lugar')
+        id_lugar = json_data.get('id_lugar')
         try:
             con = mysql.connector.connect(
                 host="143.106.241.3",
