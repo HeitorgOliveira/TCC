@@ -8,10 +8,13 @@ import re
 import bcrypt
 import mysql.connector
 import smtplib
+from flask_cors import CORS
+
 
 UPLOAD_FOLDER = "usuarios"
 
 app = Flask(__name__)
+CORS(app)
 
 app.config["SESSION_PERMANENT"] = True      #Em caso de falsa, a sessão será encerrada ao fechar o navegador
 app.config["SESSION_TYPE"] = 'filesystem'
@@ -382,7 +385,10 @@ def get_avaliacao():
                 database="cl201174"
             )
             cursor = con.cursor()
-            queue = "SELECT * FROM AC_Avaliacoes WHERE id_lugar = %s"
+            queue = """SELECT id_lugar, comentario, pontuacao, usuario, fotoperfil
+                       FROM AC_Avaliacoes 
+                       INNER JOIN AC_Usuario ON AC_Usuario.cpf = cpf_usuario
+                       WHERE id_lugar = %s"""
             values = (id_lugar,)
             cursor.execute(queue, values)
             result = cursor.fetchall()
@@ -390,11 +396,11 @@ def get_avaliacao():
             if len(result) > 0:
                 lista = []
                 for i in result:
-                    lista.append( {"id": i[0], "cpf_usuario": i[1], "id_lugar": i[2], "comentario": i[3], "pontacao": i[4]})
+                    lista.append( {"id_lugar": i[0], "comentario": i[1], "pontuacao": i[2], "usuario": i[3]})
                 return(lista)
                 #COLOCAR O RETORNO
             else:
-                return f"O usuário de cpf {id_lugar} ainda não fez nenhum comentário", 500  
+                return f"O lugar de id {id_lugar} ainda não possui comentários", 500  
         except Exception as e:
             return f"ERRO {e}", 500
         finally:
