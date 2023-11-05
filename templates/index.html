@@ -12,7 +12,7 @@
   <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='style.css') }}">
   <style type="text/css">
     body {
-			background: linear-gradient(-45deg, #0e1124, #2a3050,#669bbc, rgb(230, 223, 210));
+			background: linear-gradient(-45deg, #547b94, #5987a3,#669bbc, #e6dfd2);
 			background-size: 400% 400%;
 			animation: gradient 15s ease infinite;
 			height: 100vh;
@@ -35,6 +35,13 @@
     function botao(){
       document.getElementById("botaoMain").style.color = "#fff";
     }
+    Array.from(document.querySelectorAll(".botaoIndex")).forEach(c => {
+      c.addEventListener("keyup", e => {
+        if(e.keyCode === 13){
+          e.target.click();
+        }
+      })
+    })
   </script>
 </head>
 <body>
@@ -93,14 +100,14 @@
   {% endwith %}
 
   <!--Container principal-->
-  <div class="container-fluid myContainer">
+  <div class="container-fluid containerindex">
     <div class="row pt-2">
       <img src=" {{ 'imagens/nome.png' | url_for_static }}" alt="AccessCity">
     </div>
     <div class="row">
       <div class="col-md-5 d-grid mx-auto">
-        <a class="myButton ripple text-center" onmouseover="botao();" id="botaoMain" style="font-family: Bebas Neue, sans-serif">baixe agora!</a>
-        <!--O link vai dar para a página da play store para baixar o app-->
+        <a class="buttonIndex ripple text-center" onmouseover="botao();" id="botaoMain" style="font-family: Bebas Neue,
+         sans-serif" href="#" tabindex="0">baixe agora!</a>
       </div>
     </div>
   </div>
