@@ -69,6 +69,13 @@ footer .containerF {
     width: 70%;
 }
 
+.colunaImgFAQ{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: #5987a3;
+}
+
 /*BOTÃO PRINCIPAL*/
 .buttonIndex {
     border: none;

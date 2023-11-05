@@ -175,6 +175,10 @@ def sobre():
 def contato():
     return render_template("contato.html")
 
+@app.route('/faq')
+def faq():
+    return render_template("faq.html")
+
 @app.route('/documentos')
 @login_necessario
 def documentos():
