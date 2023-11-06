@@ -281,8 +281,6 @@ def addfoto():
                 print("Erro ao alterar foto")
                 return redirect('/')
 
-
-
 @app.route('/email', methods = ["GET", "POST"])
 def email():
     if request.method == "GET":
