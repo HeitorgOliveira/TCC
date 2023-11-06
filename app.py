@@ -284,8 +284,6 @@ def addfoto():
             else:
                 print("Erro ao alterar foto")
                 return redirect('/')
-<<<<<<< HEAD
-=======
 
 @app.route('/email', methods = ["GET", "POST"])
 def email():
@@ -315,8 +313,7 @@ def email():
         except Exception as err:
             print(f"Erro: {err}")
             return redirect('/')
->>>>>>> dc05cc173365d3b845c37b80fa02f08dcdffe38c
-        
+    
 @app.route('/alteranome', methods = ["POST"])
 @login_necessario
 def alteranome():
