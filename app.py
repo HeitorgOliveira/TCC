@@ -49,7 +49,10 @@ class Usuario:
         #Retorna Nome, Nome de usuário, Email, celular e Data de nascimento do usuário em formato JSON
         data = {'cpf' : self.cpf, 'nome_completo': self.nome, 'nome_usuario': self.usuario, 'email': self.email, 'celular': self.celular, 'data_nascimento': self.datanasc}
         return jsonify(data)
-
+    
+    def get_nome_email(self):
+        data = {'nome': self.nome, 'email': self.email}
+        return jsonify(data)
 
     def cadastrar(self):
         try:
@@ -260,7 +263,8 @@ def login():
 def sair():
     if request.method == "POST":
         session.clear()
-        return redirect("/")
+        return redirect("/")    
+    
     
 @app.route('/addfoto', methods = ["POST"])
 def addfoto():
@@ -280,36 +284,7 @@ def addfoto():
             else:
                 print("Erro ao alterar foto")
                 return redirect('/')
-
-@app.route('/email', methods = ["GET", "POST"])
-def email():
-    if request.method == "GET":
-        sender = 'algumemail@gmail.com'
-        senha = "senha"
-        receiver = 'gkfvrcntzfwmlcfhpb@cwmxc.com'
-
-        assunto = "Recuperação de senha"
-        mensagem = 'Olá, vimos que você selecionou a opção de trocar senha, para continuar <a href="ENDEREÇO DA TROCA DE EMAIL">acesse aqui</a>.'
-
-        msg = MIMEMultipart()
-        msg['De'] = sender
-        msg['Para'] = receiver
-        msg['Assunto'] = assunto
-        msg.attach(MIMEText(mensagem, 'pain'))
-
-        try:
-            smtpObj = smtplib.SMTP('smtp.@gmail.com', 587)
-            smtpObj.starttls()
-            smtpObj.login(sender, senha)
-            smtpObj.sendmail(sender, receiver, msg.as_string())
-            smtpObj.quit()
-            print("E-mail enviado com sucesso!")
-            return redirect("/")
-
-        except Exception as err:
-            print(f"Erro: {err}")
-            return redirect('/')
-        
+    
 @app.route('/alteranome', methods = ["POST"])
 @login_necessario
 def alteranome():
@@ -317,6 +292,119 @@ def alteranome():
         nome = request.form.get("NOME")
         if nome != "" or nome != session['user_id']:
             print(nome)
+
+@app.route('/trocadados', methods = ['POST'])
+def trocadados():
+    try:
+        con = mysql.connector.connect(
+            host="143.106.241.3",
+            user="cl201174",
+            password="essaehumasenha!",
+            database="cl201174"
+        )
+
+        if request.method == 'POST':
+            data_json = request.get_json()
+            dados = {}
+
+            cpf = data_json.get('cpf')
+            email = data_json.get('email')
+            nome = data_json.get('nome')
+            username = data_json.get('username')
+            celular = data_json.get('celular')
+            data_nascimento = data_json.get('data_nascimento')
+
+
+            if email != None:
+                cursor = con.cursor()
+                queue = "SELECT * FROM AC_Usuario WHERE email = %s"
+                values = (email,)
+                cursor.execute(queue, values)
+                result = cursor.fetchall()
+
+                if len(result) < 1:
+                    dados["email"] = email
+                else:
+                    print("Erro - E-mail já existente")
+                    return 'Erro - E-mail já existente', 500
+            
+            if data_nascimento != None:
+                try:
+                    datetime.strptime(data_nascimento, '%Y-%m-%d')
+                    idade = datetime.now().year - int(data_nascimento.split('-')[0])
+                    if idade < 18 or int(data_nascimento.split('-')[0] )< 1907:
+                        raise ValueError
+                    else:
+                        dados["datanascimento"] = data_nascimento
+                except (ValueError, TypeError):
+                    print("Idade inválida")
+                    return 'Erro - Idade invalida', 500
+            
+            if celular != None:
+                if not re.match(r"\d{2} \d{5}-\d{4}", celular):
+                    print("Celular inválido - Número inválido")
+                    return 'Erro - Celular inválido', 500
+                else:
+                    dados["celular"] = celular
+            
+            if nome != None:
+                dados["nomecompleto"] = nome
+            
+            if username != None:
+                dados["usuario"] = username
+            
+            print(f"Dados: {dados}")
+
+            for i in dados:
+                cursor = con.cursor()
+                queue = f"UPDATE AC_Usuario SET {i} = '{dados[i]}' WHERE cpf = %s"
+                values  = (cpf,)
+                cursor.execute(queue, values)
+                con.commit()
+
+            return 'teste', 200
+
+    except Exception as ex:
+            print(f"Got exception: {ex}")
+            return ex, 500
+    
+    finally:
+        cursor.close()
+        con.close()
+
+@app.route('/retornadados', methods = ["GET"])
+def retornadados():
+    try:
+        con = mysql.connector.connect(
+            host="143.106.241.3",
+            user="cl201174",
+            password="essaehumasenha!",
+            database="cl201174"
+        )
+
+        if request.method == "GET":
+            data_json = request.get_json()
+
+            cpf = data_json.get('cpf')
+
+            cursor = con.cursor()
+            queue = ("SELECT * FROM AC_Usuario WHERE cpf = %s")
+            values = (cpf,)
+            cursor.execute(queue, values)
+            result = cursor.fetchall()
+            print(result[0][1])
+            print(result[0][3])
+
+            usuario = Usuario(None, result[0][1], None, None, result[0][3], None, None, None)
+            return usuario.get_nome_email(), 200
+        
+    except Exception as ex:
+        print(f"Got exception {ex}")
+        return ex, 500
+    
+    finally:
+        cursor.close()
+        con.close()
 
 @app.route('/mobile/login', methods = ["POST"])
 def login_mobile():
@@ -329,6 +417,7 @@ def login_mobile():
         resultado = usuario.login()
         if resultado:
             return usuario.get_todos_dados() 
+        
 
 @app.route('/mobile/registro', methods = ["POST"])
 def registro_mobile():
