@@ -284,6 +284,38 @@ def addfoto():
             else:
                 print("Erro ao alterar foto")
                 return redirect('/')
+<<<<<<< HEAD
+=======
+
+@app.route('/email', methods = ["GET", "POST"])
+def email():
+    if request.method == "GET":
+        sender = 'algumemail@gmail.com'
+        senha = "senha"
+        receiver = 'gkfvrcntzfwmlcfhpb@cwmxc.com'
+
+        assunto = "Recuperação de senha"
+        mensagem = 'Olá, vimos que você selecionou a opção de trocar senha, para continuar <a href="ENDEREÇO DA TROCA DE EMAIL">acesse aqui</a>.'
+
+        msg = MIMEMultipart()
+        msg['De'] = sender
+        msg['Para'] = receiver
+        msg['Assunto'] = assunto
+        msg.attach(MIMEText(mensagem, 'pain'))
+
+        try:
+            smtpObj = smtplib.SMTP('smtp.@gmail.com', 587)
+            smtpObj.starttls()
+            smtpObj.login(sender, senha)
+            smtpObj.sendmail(sender, receiver, msg.as_string())
+            smtpObj.quit()
+            print("E-mail enviado com sucesso!")
+            return redirect("/")
+
+        except Exception as err:
+            print(f"Erro: {err}")
+            return redirect('/')
+>>>>>>> dc05cc173365d3b845c37b80fa02f08dcdffe38c
         
 @app.route('/alteranome', methods = ["POST"])
 @login_necessario
