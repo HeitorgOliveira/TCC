@@ -2,9 +2,9 @@
 <head>
   <meta charset="UTF-8">
   <meta hhtp-equiv="X-UA-Compatible" content="IE=edge">
-  <link rel="shortcut icon" href="imagens/Logo3.png" type="image/x-icon">
+  <link rel="shortcut icon" href="{{ 'imagens/logo3.png' | url_for_static }}" type="image/x-icon">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>AccessCity</title>
+  <title>FAQ</title>
   <!-- CSS only -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/css/bootstrap.min.css" rel="stylesheet"
     integrity="sha384-Zenh87qX5JnK2Jl0vWa8Ck2rdkQ2Bzep5IDxbcnCeuOxjzrPF/et3URy9Bv1WTRi" crossorigin="anonymous">
@@ -46,7 +46,7 @@
   <!--Começo NavBar-->
   <nav class="navbar navbar-expand-lg navbar-dark" style="background-color: #669bbc;">
     <div class="container-fluid">
-      <a class="navbar-brand" href="index.html"><img src="{{ 'imagens/logo3.png' | url_for_static }}" height="40px" width="40px"></a>
+      <a class="navbar-brand" href="/"><img src="{{ 'imagens/logo3.png' | url_for_static }}" height="40px" width="40px"></a>
       <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent"
         aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
@@ -64,7 +64,7 @@
           </li>
           {% if  session['user_id'] %}
           <li class="nav-item">
-              <a class="nav-link" href="/documentos">Documentos</a>
+              <a class="nav-link" href="/perfil">Perfil</a>
           </li>
           </ul>
             <form class="d-flex ml-auto" style="margin-left: auto;" role="search" method="post" action="/sair">
@@ -72,7 +72,7 @@
             </form>
           {% else %}
           <li class="nav-item">
-              <a class="nav-link disabled" href="/documentos">Documentos</a>
+              <a class="nav-link disabled" href="/perfil">Perfil</a>
           </li>
         </ul>
               <form class="d-flex ml-auto" role="search">

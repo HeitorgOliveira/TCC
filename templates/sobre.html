@@ -2,9 +2,9 @@
 <head>
   <meta charset="UTF=8">
   <meta hhtp-equiv="X-UA-Compatible" content="IE=edge">
-  <link rel="shortcut icon" href="imagens/Logo3.png" type="image/x-icon">
+  <link rel="shortcut icon" href="{{ 'imagens/logo3.png' | url_for_static }}" type="image/x-icon">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>AccessCity</title>
+  <title>Sobre nós</title>
 
   <!-- CSS only -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/css/bootstrap.min.css" rel="stylesheet"
@@ -109,7 +109,7 @@
           </li>
           {% if  session['user_id'] %}
                 <li class="nav-item">
-                    <a class="nav-link" href="/documentos">Documentos</a>
+                    <a class="nav-link" href="/perfil">Perfil</a>
                 </li>
                 </ul>
                   <form class="d-flex ml-auto" style="margin-left: auto;" role="search" method="post" action="/sair">
@@ -117,7 +117,7 @@
                   </form>
                 {% else %}
                 <li class="nav-item">
-                    <a class="nav-link disabled" href="/documentos">Documentos</a>
+                    <a class="nav-link disabled" href="/perfil">Perfil</a>
                 </li>
               </ul>
                     <form class="d-flex ml-auto" role="search">
@@ -200,15 +200,6 @@
         </div>
         <img src="{{ 'imagens/celular.png' | url_for_static }}" alt="Celular com o aplicativo aberto, aparecendo uma 
         avaliação de um parque com vários comentários.">
-      </div>
-      <div class="cardC">
-        <div class="conteudoC">
-          <h2>Documentos</h2>
-          <p>Você pode armazenar aquivos úteis como laudos, certificados ou o passe livre para um acesso mais rápido e 
-            fácil.</p>
-        </div>
-        <img src="{{ 'imagens/celular.png' | url_for_static }}" alt="Celular com o aplicativo aberto aparecendo uma imagem 
-        do passe livre.">
       </div>
     </div>
   </div>

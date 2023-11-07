@@ -76,6 +76,23 @@ footer .containerF {
     background-color: #5987a3;
 }
 
+.containerPerfil{
+    width: 90%;
+}
+
+.containerBranco{
+    background-color: #e6dfd2;
+    border-radius: 10px;
+    text-align: center;
+    padding: 20px;
+}
+
+.containerBranco2{
+    background-color: #e6dfd2;
+    border-radius: 10px;
+    padding: 20px;
+}
+
 /*BOTÃO PRINCIPAL*/
 .buttonIndex {
     border: none;
