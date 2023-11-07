@@ -263,8 +263,46 @@ def login():
 def sair():
     if request.method == "POST":
         session.clear()
-        return redirect("/")    
+        return redirect("/")   
+
+@app.route('/deletar', methods = ["POST"])
+def deletarusuario():
     
+        if request.method == "POST":
+            try:
+                con = mysql.connector.connect(
+                    host="143.106.241.3",
+                    user="cl201174",
+                    password="essaehumasenha!",
+                    database="cl201174"
+                )
+                data_json = request.get_json()
+                cpf = data_json.get('cpf')
+                senha = data_json.get('senha')
+                cursor = con.cursor()
+                queue = "SELECT * FROM AC_Usuario WHERE cpf = %s"
+                values = (cpf,)
+                cursor.execute(queue, values)
+                result = cursor.fetchall()
+
+                if len(result) == 1:
+                    dbhash = result[0][-1].encode('utf-8')
+                    match = bcrypt.checkpw(senha.encode('utf-8'), dbhash)
+                    if match:
+                        queue = "DELETE * FROM AC_Usuario WHERE cpf = %s"
+                        values = (cpf,)
+                        cursor.execute(queue, values)
+                        con.commit()
+                        return "Usuário deletado com sucesso", 200
+                    else:
+                        return "Senha incorreta", 500
+                return "Usuário não encontrado", 500
+            except Exception as ex:
+                print(f"ERRO - {ex}")
+                return ex, 500
+            finally:
+                cursor.close()
+                con.close()    
     
 @app.route('/addfoto', methods = ["POST"])
 def addfoto():
