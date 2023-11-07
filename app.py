@@ -2,13 +2,10 @@ from flask import Flask, request, render_template, url_for, session, flash, redi
 from flask_session import Session
 from datetime import datetime
 from functools import wraps
-from email.mime.text import MIMEText
-from email.mime.multipart import MIMEMultipart
+from flask_cors import CORS
 import re
 import bcrypt
 import mysql.connector
-import smtplib
-from flask_cors import CORS
 
 
 UPLOAD_FOLDER = "usuarios"
@@ -25,7 +22,7 @@ def login_necessario(f):
     @wraps(f)
     def decorated_function(*args, **kwargs):
         if 'cpf' not in session:
-            flash("Você não tem acesso a esta página", "error")
+            flash("Você não tem acesso a essa página", "error")
             return redirect('/')
         return f(*args, **kwargs)
     return decorated_function
@@ -124,7 +121,7 @@ class Usuario:
                     con.close()
                     return True
                 else:
-                    print("Login falhou - Senha não bate")
+                    print("Login falhou - Senha incorreta")
                     return False
             cursor.close()
             con.close()
@@ -190,12 +187,49 @@ def documentos():
 @app.route('/perfil')
 @login_necessario
 def perfil():
-    return render_template("perfil.html")
+    try:
+        con = mysql.connector.connect(
+            host="143.106.241.3",
+            user="cl201174",
+            password="essaehumasenha!",
+            database="cl201174"
+        )
+        cursor = con.cursor()
+        queue = "SELECT * FROM AC_Usuario WHERE cpf = %s"
+        values = (session['cpf'],)
+        cursor.execute(queue, values)
+        result = cursor.fetchall()
+        if len(result) > 0:
+            linha = result[0]
+            nome = linha[1]
+            user = linha[2]
+            email = linha[3]
+            celular = linha[4]
+            datanasc = linha[5]
+
+            dados = {
+                'nome': nome,
+                'usuario': user,
+                'email': email,
+                'celular': celular,
+                'nascimento': datanasc,
+            }
+            return render_template("perfil.html", **dados), 200
+
+        else:
+            print("CPF inválido")
+            return "ERRO - CPF inválido", 500
+        
+    except Exception as err:
+        print(f"ERRO: {err}")
+        return f"ERRO - {err}", 500
+
+    
 
 @app.route('/cadastro', methods=['GET', 'POST'])
 def cadastro():
     if request.method == 'POST':
-        nomecompleto = request.form.get('nomecompleto')
+        nomecompleto = request.form.get('nome')
         user = request.form.get('user')
         date = request.form.get('date')
         cpf = request.form.get('cpf')
@@ -340,6 +374,7 @@ def trocadados():
             password="essaehumasenha!",
             database="cl201174"
         )
+        cursor = con.cursor()
 
         if request.method == 'POST':
             data_json = request.get_json()
@@ -401,6 +436,92 @@ def trocadados():
                 con.commit()
 
             return 'teste', 200
+
+    except Exception as ex:
+            print(f"Got exception: {ex}")
+            return ex, 500
+    
+    finally:
+        cursor.close()
+        con.close()
+
+@app.route('/trocadadosWeb', methods = ['POST'])
+def trocadadosWeb():
+    try:
+        con = mysql.connector.connect(
+            host="143.106.241.3",
+            user="cl201174",
+            password="essaehumasenha!",
+            database="cl201174"
+        )
+        cursor = con.cursor()
+
+        if request.method == 'POST':
+            dados = {}
+
+            cpf = session['cpf']
+            email = request.form.get('email')
+            nome = request.form.get('nome')
+            username = request.form.get('user')
+            celular = request.form.get('celular')
+            data_nascimento = request.form.get('nascimento')
+
+
+            if email != None:
+                cursor = con.cursor()
+                queue = "SELECT * FROM AC_Usuario WHERE email = %s AND cpf = %s"
+                values = (email, cpf,)
+                cursor.execute(queue, values)
+                result = cursor.fetchall()
+
+                if len(result) < 1:
+                    queue = "SELECT * FROM AC_Usuario WHERE email = %s"
+                    values = (email,)
+                    cursor.execute(queue, values)
+                    result = cursor.fetchall()
+
+                    if len(result) < 1:
+                        dados["email"] = email
+
+                    else:
+                        print("Erro - E-mail já existente")
+                        return 'Erro - E-mail já existente', 500
+            
+            if data_nascimento != None:
+                try:
+                    datetime.strptime(data_nascimento, '%Y-%m-%d')
+                    idade = datetime.now().year - int(data_nascimento.split('-')[0])
+                    if idade < 18 or int(data_nascimento.split('-')[0] )< 1907:
+                        raise ValueError
+                    else:
+                        dados["datanascimento"] = data_nascimento
+                except (ValueError, TypeError):
+                    print("Idade inválida")
+                    return 'Erro - Idade invalida', 500
+            
+            if celular != None:
+                if not re.match(r"\d{2} \d{5}-\d{4}", celular):
+                    print("Celular inválido - Número inválido")
+                    return 'Erro - Celular inválido', 500
+                else:
+                    dados["celular"] = celular
+            
+            if nome != None:
+                dados["nomecompleto"] = nome
+            
+            if username != None:
+                dados["usuario"] = username
+            
+            print(f"Dados: {dados}")
+
+            for i in dados:
+                cursor = con.cursor()
+                queue = f"UPDATE AC_Usuario SET {i} = '{dados[i]}' WHERE cpf = %s"
+                values  = (cpf,)
+                cursor.execute(queue, values)
+                con.commit()
+
+            return redirect('/')
 
     except Exception as ex:
             print(f"Got exception: {ex}")
@@ -610,7 +731,10 @@ def usuario_deficiencia():
                 values = (codigo_deficiencia, cpf_usuario)
                 cursor.execute(queue, values)
                 con.commit()
-                return "Associação feita com sucesso"
+                return "Associação feita com sucesso", 200
+            
+            else:
+                return "ERRO - usuário não consta no banco de dados", 500
             
         except Exception as e:
             return f"ERRO - {e}", 500
