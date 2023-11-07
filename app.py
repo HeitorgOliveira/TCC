@@ -387,7 +387,6 @@ def trocadados():
             celular = data_json.get('celular')
             data_nascimento = data_json.get('data_nascimento')
 
-
             if email != None:
                 cursor = con.cursor()
                 queue = "SELECT * FROM AC_Usuario WHERE email = %s"
@@ -398,13 +397,27 @@ def trocadados():
                 if len(result) < 1:
                     dados["email"] = email
                 else:
-                    print("Erro - E-mail já existente")
-                    return 'Erro - E-mail já existente', 500
+                    queue = "SELECT email FROM AC_Usuario WHERE cpf = %s"
+                    values = (re.sub(r"\D", "", cpf),)
+                    cursor.execute(queue, values)
+                    result = cursor.fetchall()
+
+                    start_index = str(result).find("'") 
+                    end_index = str(result).rfind("'")
+                    emailFormatado = str(result)[start_index + 1:end_index]
+                    print(emailFormatado)
+
+                    if emailFormatado == email: 
+                        dados["email"] = email
+                    else: 
+                        print("Erro - Email já existe")
+                        return 'Erro - Email já existe', 500
             
             if data_nascimento != None:
                 try:
                     datetime.strptime(data_nascimento, '%Y-%m-%d')
                     idade = datetime.now().year - int(data_nascimento.split('-')[0])
+                    print(idade)
                     if idade < 18 or int(data_nascimento.split('-')[0] )< 1907:
                         raise ValueError
                     else:
@@ -424,7 +437,30 @@ def trocadados():
                 dados["nomecompleto"] = nome
             
             if username != None:
-                dados["usuario"] = username
+                cursor = con.cursor()
+                queue = "SELECT * FROM AC_Usuario WHERE usuario = %s"
+                values = (username,)
+                cursor.execute(queue, values)
+                result = cursor.fetchall()
+
+                if len(result) < 1:
+                    dados["usuario"] = username
+                else:
+                    queue = "SELECT usuario FROM AC_Usuario WHERE cpf = %s"
+                    values = (re.sub(r"\D", "", cpf),)
+                    cursor.execute(queue, values)
+                    result = cursor.fetchall()
+
+                    start_index = str(result).find("'") 
+                    end_index = str(result).rfind("'")
+                    userFormatado = str(result)[start_index + 1:end_index]
+                    print(userFormatado)
+
+                    if userFormatado == username: 
+                        dados["usuario"] = username
+                    else: 
+                        print("Erro - Username já existe")
+                        return 'Erro - Username já existe', 500
             
             print(f"Dados: {dados}")
 
