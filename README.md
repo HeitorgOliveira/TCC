@@ -35,9 +35,12 @@
 ## 👥 Authors
 This project was developed by:
 
-Heitor Gomes de Oliveira\n
-Luanna Sachinelli Paggiaro\n
-Catarina Fagotti Bonifácio\n
+Heitor Gomes de Oliveira
+
+Luanna Sachinelli Paggiaro
+
+Catarina Fagotti Bonifácio
+
 Natália Carvalho
 
 ## 🎓 Project Info
