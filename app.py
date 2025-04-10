@@ -89,10 +89,10 @@ class Usuario:
     def login(self):
         try:
             con = mysql.connector.connect(
-                host="143.106.241.3",
-                user="cl201174",
-                password="essaehumasenha!",
-                database="cl201174"
+                host="host",
+                user="user",
+                password="password",
+                database="database"
             )
             cursor = con.cursor()
             queue = "SELECT * FROM AC_Usuario WHERE email = %s"
@@ -134,10 +134,10 @@ class Usuario:
     def addfoto(self, foto):
         try:
             con = mysql.connector.connect(
-                host="143.106.241.3",
-                user="cl201174",
-                password="essaehumasenha!",
-                database="cl201174"
+                host="host",
+                user="user",
+                password="password",
+                database="database"
             )
             cursor = con.cursor()
             queue = "SELECT * FROM AC_Usuario WHERE cpf = %s"
@@ -189,10 +189,10 @@ def documentos():
 def perfil():
     try:
         con = mysql.connector.connect(
-            host="143.106.241.3",
-            user="cl201174",
-            password="essaehumasenha!",
-            database="cl201174"
+            host="hostname",
+            user="user",
+            password="password",
+            database="database"
         )
         cursor = con.cursor()
         queue = "SELECT * FROM AC_Usuario WHERE cpf = %s"
@@ -305,10 +305,10 @@ def deletarusuario():
         if request.method == "POST":
             try:
                 con = mysql.connector.connect(
-                    host="143.106.241.3",
-                    user="cl201174",
-                    password="essaehumasenha!",
-                    database="cl201174"
+                    host="host",
+                    user="user",
+                    password="password",
+                    database="database"
                 )
                 data_json = request.get_json()
                 cpf = data_json.get('cpf')
@@ -369,10 +369,10 @@ def alteranome():
 def trocadados():
     try:
         con = mysql.connector.connect(
-            host="143.106.241.3",
-            user="cl201174",
-            password="essaehumasenha!",
-            database="cl201174"
+            host="host",
+            user="user",
+            password="password",
+            database="database"
         )
         cursor = con.cursor()
 
@@ -485,10 +485,10 @@ def trocadados():
 def trocadadosWeb():
     try:
         con = mysql.connector.connect(
-            host="143.106.241.3",
-            user="cl201174",
-            password="essaehumasenha!",
-            database="cl201174"
+            host="host",
+            user="user",
+            password="password",
+            database="database"
         )
         cursor = con.cursor()
 
@@ -571,12 +571,11 @@ def trocadadosWeb():
 def retornadados():
     try:
         con = mysql.connector.connect(
-            host="143.106.241.3",
-            user="cl201174",
-            password="essaehumasenha!",
-            database="cl201174"
+            host="host",
+            user="user",
+            password="password",
+            database="database"
         )
-
         if request.method == "GET":
             data_json = request.get_json()
 
@@ -665,10 +664,10 @@ def get_avaliacao():
         id_lugar = json_data.get('id_lugar')
         try:
             con = mysql.connector.connect(
-                host='143.106.241.3',
-                user="cl201174",
-                password="essaehumasenha!",
-                database="cl201174"
+                host="host",
+                user="user",
+                password="password",
+                database="database"
             )
             cursor = con.cursor()
             queue = """SELECT id_lugar, comentario, pontuacao, usuario, fotoperfil
@@ -704,10 +703,10 @@ def avaliacao():
         id_lugar = json_data.get('id_lugar')
         try:
             con = mysql.connector.connect(
-                host="143.106.241.3",
-                user="cl201174",
-                password="essaehumasenha!",
-                database="cl201174"
+                host="host",
+                user="user",
+                password="password",
+                database="database"
             )
 
             cursor = con.cursor()
@@ -738,11 +737,11 @@ def usuario_deficiencia():
     if request.method == 'POST':
         try:
             con = mysql.connector.connect(
-                    host="143.106.241.3",
-                    user="cl201174",
-                    password="essaehumasenha!",
-                    database="cl201174"
-                )
+                host="host",
+                user="user",
+                password="password",
+                database="database"
+            )
             
             json_data = request.get_json()
             cpf_usuario = json_data.get('cpf_usuario')
