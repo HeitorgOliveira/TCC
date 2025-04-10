@@ -35,10 +35,10 @@
 ## 👥 Authors
 This project was developed by:
 
-Heitor Gomes de Oliveira
-Luanna Sachinelli Paggiaro
-Catarina Fagotti Bonifácio
-Natália Carvalho
+Heitor Gomes de Oliveira\\
+Luanna Sachinelli Paggiaro\\
+Catarina Fagotti Bonifácio\\
+Natália Carvalho\\
 
 ## 🎓 Project Info
 Final project for the Technical Course in Software Development – COTIL / UNICAMP.
