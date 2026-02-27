@@ -19,7 +19,7 @@
 
 1. Clone this repository:
   ```bash
-  git clone https://github.com/yourusername/access-city.git
+  git clone https://github.com/HeitorgOliveira/TCC.git
   ```
 
 2. Install the dependencies:
