@@ -54,10 +54,10 @@ class Usuario:
     def cadastrar(self):
         try:
             con = mysql.connector.connect(
-                host="143.106.241.3",
-                user="cl201174",
-                password="essaehumasenha!",
-                database="cl201174"
+                host="",
+                user="",
+                password="",
+                database=""
             )
             cursor = con.cursor()
             queue = "SELECT * FROM AC_Usuario WHERE email = %s"
